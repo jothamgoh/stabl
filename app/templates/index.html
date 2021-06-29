@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<h1>Please Login to Continue.</h1>
+<a href="{{ url_for('auth.admin_login') }}">Admin Login</a>
+<a href="{{ url_for('auth.customer_login') }}">Customer Login</a>
+
+
+{% endblock %}

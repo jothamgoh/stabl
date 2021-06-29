@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<h1>Hi {{ current_user.name }}</h1>
+
+<p>Create a new admin: <a href="{{ url_for('auth.admin_register') }}"> Click to register admin</a></p>
+<p>Create a new customer: <a href="{{ url_for('auth.customer_register') }}"> Click to register customer</a></p>
+<p>Placeholder to find existing customer and add new package</p>
+{% endblock %}
