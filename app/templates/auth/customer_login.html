@@ -10,7 +10,13 @@
     </div>
     <br>
     <p>
+        Don't know  your password?
+        <a href="{{ url_for('auth.customer_login_otp') }}">Login using OTP instead</a>
+    </p>
+    
+    <p>
         Changed your phone number?
         <a href="">Change your phone number through email</a>
     </p>
+
 {% endblock %}

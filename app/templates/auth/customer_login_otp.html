@@ -2,7 +2,7 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
-    <h1>Key in OTP</h1>
+    <h1>Sign In</h1>
     <div class="row">
         <div class="col-md-4">
             {{ wtf.quick_form(form) }}
@@ -10,11 +10,10 @@
     </div>
     <br>
     <p>
-        Login using your password
-        <a href="{{ url_for('auth.customer_login') }}">Login using OTP instead</a>
+        <a href="{{ url_for('auth.customer_login') }}">Use your phone number and password to login</a>
     </p>
     <p>
-        Login using
-        <a href="">email instead</a>
+        Changed your phone number?
+        <a href="">Change your phone number through email</a>
     </p>
 {% endblock %}

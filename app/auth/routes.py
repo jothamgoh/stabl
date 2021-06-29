@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, current_user
 from app.auth import bp
 from app import db
 from app.models import Customer, User, Admin
-from app.auth.forms import AdminLoginForm, AdminRegistrationForm, AdminResetPasswordRequestForm, AdminResetPasswordForm, CustomerLoginForm, CustomerRegistrationForm, CustomerOTPForm
+from app.auth.forms import AdminLoginForm, AdminRegistrationForm, AdminResetPasswordRequestForm, AdminResetPasswordForm, CustomerLoginOTPForm, CustomerRegistrationForm, CustomerOTPForm, CustomerLoginForm
 from app.auth.email import send_password_reset_email
 from app.decorators import login_required
 from app.auth.twilio_verify import request_verification_token, check_verification_token, check_and_clean_phone_number
@@ -70,21 +70,43 @@ def customer_login():
         return redirect(url_for('main.customer_home'))
     form = CustomerLoginForm()
     if form.validate_on_submit():
+        try:
+            phone_number = check_and_clean_phone_number(form.phone_or_email.data)
+            user = Customer.query.filter_by(phone=phone_number).first()
+        except:
+            user = Customer.query.filter_by(email=form.phone_or_email.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash(('Invalid email, phone number or password'))
+            return redirect(url_for('auth.customer_login'))
+        login_user(user, remember=form.remember_me.data)
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('main.customer_home')
+        return redirect(next_page)
+    return render_template('auth/customer_login.html', title=('Sign In'), form=form)
+
+
+@bp.route('/login-otp', methods=['GET', 'POST'])
+def customer_login_otp():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.customer_home'))
+    form = CustomerLoginOTPForm()
+    if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
         user = Customer.query.filter_by(phone=phone_number).first()
         if user is None or not user.check_phone(phone_number):
             flash(('Invalid phone number'))
-            return redirect(url_for('auth.customer_login'))
+            return redirect(url_for('auth.customer_login_otp'))
         request_verification_token(phone_number)
         session['phone'] = check_and_clean_phone_number(phone_number)  
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main.customer_home')
         return redirect(url_for('auth.customer_otp', next=next_page, remember='1' if form.remember_me.data else '0'))
-    return render_template('auth/customer_login.html', title=('Sign In'), form=form)
+    return render_template('auth/customer_login_otp.html', title=('Sign In'), form=form)
 
 
-@bp.route('/login-otp', methods=['GET', 'POST'])
+@bp.route('/login-otp-validation', methods=['GET', 'POST'])
 def customer_otp():
     if current_user.is_authenticated:
         return redirect(url_for('main.customer_home'))
@@ -99,7 +121,6 @@ def customer_otp():
             login_user(user, remember=remember)
             return redirect(next_page)
         else:
-            print('error why is this happening', file=sys.stderr)
             flash(('Invalid OTP. Please key in again'))
             return redirect(url_for('auth.customer_otp'))
     return render_template('auth/customer_otp.html', title=('Key in One Time Password'), form=form)

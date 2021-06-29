@@ -42,7 +42,14 @@ class AdminResetPasswordForm(FlaskForm):
 
 
 class CustomerLoginForm(FlaskForm):
-    phone = StringField(('Phone Number'), validators=[DataRequired()])
+    phone_or_email = StringField(('Email or Phone Number'), validators=[DataRequired()])
+    password = PasswordField(('Password'), validators=[DataRequired()])
+    remember_me = BooleanField(('Remember Me'))
+    submit = SubmitField(('Sign In'))
+
+
+class CustomerLoginOTPForm(FlaskForm):
+    phone = StringField(('Phone'), validators=[DataRequired()])
     remember_me = BooleanField(('Remember Me'))
     submit = SubmitField(('Get OTP'))
 
