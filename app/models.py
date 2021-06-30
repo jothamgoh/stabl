@@ -1,3 +1,4 @@
+from sqlalchemy.orm import backref
 from app import db, login
 from datetime import datetime
 from flask_login import UserMixin
@@ -21,6 +22,7 @@ class Customer(User):
     email = db.Column(db.String(120), index=True, unique=True)    
     phone = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    package_bought = db.relationship('Package', backref='customer', lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -42,6 +44,7 @@ class Admin(User):
     name = db.Column(db.String(64))
     email = db.Column(db.String(120), index=True, unique=True)    
     password_hash = db.Column(db.String(128))
+    package_sold = db.relationship('Package', backref='admin', lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -56,19 +59,27 @@ class Admin(User):
 
 class Package(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    admin_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     cust_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     package_name = db.Column(db.String(64))
-    package_total_uses_at_start = db.Column(db.Integer)
-    package_uses_left_when_keyed = db.Column(db.Integer)
-    package_num_times_used_after_keyed = db.Column(db.Integer)
-    package_price = db.Column(db.Integer)
+    package_total_uses_at_start = db.Column(db.Integer) # number of total uses of package at the start
+    package_uses_left_when_keyed = db.Column(db.Integer) # number of uses when package keyed in - for migration into stabl
+    package_num_times_used_after_keyed = db.Column(db.Integer) # number of times customer used package after migration into stabl
+    package_price_paid = db.Column(db.Integer) # price customer paid
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    admin_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    package_usage = db.relationship('PackageUse', backref='package', lazy='dynamic')
 
     def __repr__(self):
         return '<Package {}>'.format(self.id)
 
 
+class PackageUse(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    package_id = db.Column(db.Integer, db.ForeignKey('package.id'))
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<Package usage {}>'.format(self.id)
 
 
 @login.user_loader
