@@ -2,8 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import Admin, Customer
-from twilio.rest import Client
-from twilio.base.exceptions import TwilioRestException
 
 
 class AdminLoginForm(FlaskForm):
@@ -42,7 +40,7 @@ class AdminResetPasswordForm(FlaskForm):
 
 
 class CustomerLoginForm(FlaskForm):
-    phone_or_email = StringField(('Email or Phone Number'), validators=[DataRequired()])
+    phone_or_email = StringField(('Phone Number or Email'), validators=[DataRequired()])
     password = PasswordField(('Password'), validators=[DataRequired()])
     remember_me = BooleanField(('Remember Me'))
     submit = SubmitField(('Sign In'))

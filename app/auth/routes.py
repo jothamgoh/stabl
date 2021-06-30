@@ -7,7 +7,9 @@ from app.models import Customer, User, Admin
 from app.auth.forms import AdminLoginForm, AdminRegistrationForm, AdminResetPasswordRequestForm, AdminResetPasswordForm, CustomerLoginOTPForm, CustomerRegistrationForm, CustomerOTPForm, CustomerLoginForm
 from app.auth.email import send_password_reset_email
 from app.decorators import login_required
-from app.auth.twilio_verify import request_verification_token, check_verification_token, check_and_clean_phone_number
+from app.auth.twilio_verify import request_verification_token, check_verification_token
+from app.helperfunc import check_and_clean_phone_number
+
 
 @bp.route('/login/admin', methods=['GET', 'POST'])
 def admin_login():
@@ -115,6 +117,7 @@ def customer_otp():
         phone = check_and_clean_phone_number(session['phone'])
         token = form.otp.data
         if check_verification_token(phone, token):
+            del session['phone']
             user = Customer.query.filter_by(phone=phone).first()
             next_page = request.args.get('next')
             remember = request.args.get('remember', '0') == '1'
