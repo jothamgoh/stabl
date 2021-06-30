@@ -67,6 +67,7 @@ class Package(db.Model):
     package_num_times_used_after_keyed = db.Column(db.Integer) # number of times customer used package after migration into stabl
     package_price_paid = db.Column(db.Integer) # price customer paid
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=1)
     package_usage = db.relationship('PackageUse', backref='package', lazy='dynamic')
 
     def __repr__(self):
