@@ -15,7 +15,6 @@ class User(UserMixin, db.Model):
     }
 
 
-
 class Customer(User):
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     name = db.Column(db.String(64))
@@ -38,7 +37,6 @@ class Customer(User):
     }
 
 
-
 class Admin(User):
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     name = db.Column(db.String(64))
@@ -54,6 +52,23 @@ class Admin(User):
     __mapper_args__ = {
         'polymorphic_identity':'admin',
     }
+
+
+class Package(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    cust_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    package_name = db.Column(db.String(64))
+    package_total_uses_at_start = db.Column(db.Integer)
+    package_uses_left_when_keyed = db.Column(db.Integer)
+    package_num_times_used_after_keyed = db.Column(db.Integer)
+    package_price = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    admin_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return '<Package {}>'.format(self.id)
+
+
 
 
 @login.user_loader
