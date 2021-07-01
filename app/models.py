@@ -1,7 +1,7 @@
 from sqlalchemy.orm import backref
 from app import db, login
 from datetime import datetime
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import phonenumbers
 from flask import jsonify
@@ -76,20 +76,20 @@ class Package(db.Model):
     def __repr__(self):
         return '<Package {}>'.format(self.id)
 
-    def get_customer_package_data(self, cust_id):
-        packages = Package.query.filter_by(cust_id=cust_id).all()
-        
-        def to_json(self):
-            return {
-                'package_name': self.package_name,
-                'package_uses_left_when_keyed': self.package_uses_left_when_keyed
-            }
-            
+    def list_customer_package_data(self):
+        return {
+            'package_id': self.id,
+            'package_total_uses_at_start': self.package_total_uses_at_start,
+            'package_name': self.package_name,
+            'num_uses_left': (self.package_uses_left_when_keyed - self.package_num_times_used_after_keyed),
+            'created_at': self.created_at
+        }
 
 class PackageUse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     package_id = db.Column(db.Integer, db.ForeignKey('package.id'))
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
 
     def __repr__(self):
         return '<Package usage {}>'.format(self.id)

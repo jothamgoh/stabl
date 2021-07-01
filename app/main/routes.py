@@ -20,10 +20,12 @@ def admin_home():
     return render_template('admin_home.html', title='Home')
 
 
-@bp.route('/home/<id>', methods=['GET', 'POST'])
+@bp.route('/home', methods=['GET', 'POST'])
 @login_required(role='customer')
-def customer_home(id): 
-    return render_template('customer_home.html', title='Home')
+def customer_home():
+    packages = Package.query.filter_by(cust_id=current_user.id).all()
+    package_data = [package.list_customer_package_data() for package in packages]
+    return render_template('customer_home.html', title='Home', package_data=package_data)
 
 
 @bp.route('/admin/search-customer', methods=['GET', 'POST'])
@@ -69,7 +71,11 @@ def register_new_package():
         return redirect(url_for('main.admin_home'))
     return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
+from flask import jsonify
 
-# @bp.route('/package/use_package', methods=['POST'])
-# @login_required()
-# def use_package():
+@bp.route('/package/list-package-data', methods=['POST'])
+@login_required(role='customer')
+def list_package_data():
+    packages = Package.query.filter_by(cust_id=current_user.id).all()
+    data = [package.list_customer_package_data() for package in packages]
+    return jsonify(data)

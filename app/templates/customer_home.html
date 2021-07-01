@@ -4,5 +4,16 @@
 {% block app_content %}
 <h1>Hi {{ current_user.name }}</h1>
 
-<p>Existing package 1<a href=""> Use package</a></p>
+
+{% for package in package_data %}
+<div class="package">
+<h4><b>{{ package.package_name }}</b></h4>
+<p>{{ package.package_id }}</p>
+<p>Total sessions bought: {{ package.package_total_uses_at_start }}</p>
+<p>Number of uses left: {{ package.num_uses_left }}</p>
+<p>Date package bought: {{ package.created_at }}</p>
+<br>
+</div>
+{% endfor %}
+
 {% endblock %}
