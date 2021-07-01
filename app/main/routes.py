@@ -23,6 +23,7 @@ def admin_home():
 @bp.route('/home', methods=['GET', 'POST'])
 @login_required(role='customer')
 def customer_home():
+    # list package data
     packages = Package.query.filter_by(cust_id=current_user.id).all()
     package_data = [package.list_customer_package_data() for package in packages]
     return render_template('customer_home.html', title='Home', package_data=package_data)
@@ -75,7 +76,5 @@ from flask import jsonify
 
 @bp.route('/package/list-package-data', methods=['POST'])
 @login_required(role='customer')
-def list_package_data():
-    packages = Package.query.filter_by(cust_id=current_user.id).all()
-    data = [package.list_customer_package_data() for package in packages]
-    return jsonify(data)
+def use_package():
+    
