@@ -19,7 +19,7 @@
                 {% elif current_user.role == 'admin' %}
                 <a class="navbar-brand" href="{{ url_for('main.admin_home') }}">Stabl</a>
                 {% elif current_user.role == 'customer' %}
-                <a class="navbar-brand" href="{{ url_for('main.customer_home') }}">Stabl</a>
+                <a class="navbar-brand" href="{{ url_for('main.customer_home', id=current_user.id) }}">Stabl</a>
                 {% endif %}
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">

@@ -20,9 +20,9 @@ def admin_home():
     return render_template('admin_home.html', title='Home')
 
 
-@bp.route('/home', methods=['GET', 'POST'])
+@bp.route('/home/<id>', methods=['GET', 'POST'])
 @login_required(role='customer')
-def customer_home():
+def customer_home(id): 
     return render_template('customer_home.html', title='Home')
 
 
@@ -69,3 +69,7 @@ def register_new_package():
         return redirect(url_for('main.admin_home'))
     return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
+
+# @bp.route('/package/use_package', methods=['POST'])
+# @login_required()
+# def use_package():

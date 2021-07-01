@@ -4,6 +4,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import phonenumbers
+from flask import jsonify
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,6 +34,7 @@ class Customer(User):
     def check_phone(self, phone):
         number = phonenumbers.parse(phone, 'SG')
         return phonenumbers.is_valid_number(number)
+
 
     __mapper_args__ = {
         'polymorphic_identity':'customer',
@@ -74,6 +76,15 @@ class Package(db.Model):
     def __repr__(self):
         return '<Package {}>'.format(self.id)
 
+    def get_customer_package_data(self, cust_id):
+        packages = Package.query.filter_by(cust_id=cust_id).all()
+        
+        def to_json(self):
+            return {
+                'package_name': self.package_name,
+                'package_uses_left_when_keyed': self.package_uses_left_when_keyed
+            }
+            
 
 class PackageUse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
