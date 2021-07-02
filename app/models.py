@@ -82,8 +82,11 @@ class Package(db.Model):
             'package_total_uses_at_start': self.package_total_uses_at_start,
             'package_name': self.package_name,
             'num_uses_left': (self.package_uses_left_when_keyed - self.package_num_times_used_after_keyed),
-            'created_at': self.created_at
+            'created_at': self.created_at,
+            'is_active': self.is_active
         }
+
+    
 
 class PackageUse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
