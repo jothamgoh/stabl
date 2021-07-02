@@ -74,7 +74,22 @@ def register_new_package():
 
 from flask import jsonify
 
-@bp.route('/package/list-package-data', methods=['POST'])
+@bp.route('/package/use-package/<package_id>', methods=['GET', 'POST'])
 @login_required(role='customer')
-def use_package():
-    
+def use_package(package_id):
+    p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
+    num_uses_left = p.package_uses_left_when_keyed - p.package_num_times_used_after_keyed
+    if num_uses_left == 1:
+        p.is_active = 0
+        p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
+        db.session.commit()
+        flash('Congrats! You have used this package. This is your final use, the package is now inactive.')
+    elif num_uses_left <= 0:
+        p.is_active = 0
+        db.session.commit()
+        flash('You have finished using this package. Please buy a new one.')
+    else:
+        p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
+        db.session.commit()
+        flash('Congrats! You have used this package')
+    return render_template('customer_home.html', title='Home')
