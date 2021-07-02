@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+<h1>Hi {{ current_user.name }}</h1>
+
+<h2>Package Usage Summary</h2>
+<br>
+
+<div class="package">
+<h4><b>{{ package_data.package_name }}</b></h4>
+<p>Total sessions bought: {{ package_data.package_total_uses_at_start }}</p>
+<p>Number of uses left: {{ package_data.num_uses_left }}</p>
+<p>Date package bought: {{ package_data.created_at }}</p> 
+<p>Price paid: {{ package_data.currency }} {{ package_data.package_price_paid_in_cents / 100}}</p>
+<p>Package status: {% if package_data.is_active == 1  %} Active {% else %} Inactive {% endif %}</p>
+<br>
+</div>
+
+<p><b>Package usage:</b></p]>
+{% for package_use in package_use_data %}
+<div class="Package Usage">
+<p>Datetime used: {{ package_use.created_at }} </p>
+{% endfor %}
+<br>
+</div>
+
+<a href="{{ url_for('main.customer_home') }}"><button>Return to home</button></a>
+
+{% endblock %}

@@ -73,7 +73,6 @@ def register_new_package():
         return redirect(url_for('main.admin_home'))
     return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
-from flask import jsonify
 
 @bp.route('/package/use-package/<package_id>', methods=['GET', 'POST'])
 @login_required(role='customer')
@@ -87,14 +86,27 @@ def use_package(package_id):
         db.session.add(package_use)
         db.session.commit()
         flash('Congrats! You have succesfully used this package. This package is finished and is now inactive.')
+        return redirect(url_for('main.display_package_summary', package_id=package_id))
     elif num_uses_left <= 0:
         p.is_active = 0
         db.session.commit()
         flash('You have finished using this package.')
+        return redirect(url_for('main.display_package_summary', package_id=package_id))
     else:
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
         package_use = PackageUse(package_id=package_id)
         db.session.add(package_use)
         db.session.commit()
         flash('Congrats! You have used this package')
+        return redirect(url_for('main.display_package_summary', package_id=package_id))
     return render_template('customer_home.html', title='Home')
+
+@bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])
+@login_required()
+def display_package_summary(package_id):
+    package = Package.query.filter_by(id=package_id).first_or_404()
+    package_data = package.list_customer_package_data()
+    
+    package_use_list = package.package_usage.order_by(PackageUse.created_at.desc()).all()
+    package_use_data = [{'created_at': package_use.created_at} for package_use in package_use_list]
+    return render_template('main/package_summary.html', title='Package Summary', package_data=package_data, package_use_data=package_use_data)
