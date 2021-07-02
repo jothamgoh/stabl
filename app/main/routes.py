@@ -83,11 +83,11 @@ def use_package(package_id):
         p.is_active = 0
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
         db.session.commit()
-        flash('Congrats! You have used this package. This is your final use, the package is now inactive.')
+        flash('Congrats! You have succesfully used this package. This package is finished and is now inactive.')
     elif num_uses_left <= 0:
         p.is_active = 0
         db.session.commit()
-        flash('You have finished using this package. Please buy a new one.')
+        flash('You have finished using this package.')
     else:
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
         db.session.commit()
