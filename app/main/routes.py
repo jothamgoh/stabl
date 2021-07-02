@@ -2,10 +2,11 @@ from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
-from app.models import Customer, Package
+from app.models import Customer, Package, PackageUse
 from app.main.forms import SearchCustomerForm, RegisterPackageForm
 from app.helperfunc import check_and_clean_phone_number
 from flask_login import current_user
+from datetime import datetime
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
@@ -82,6 +83,8 @@ def use_package(package_id):
     if num_uses_left == 1:
         p.is_active = 0
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
+        package_use = PackageUse(package_id=package_id)
+        db.session.add(package_use)
         db.session.commit()
         flash('Congrats! You have succesfully used this package. This package is finished and is now inactive.')
     elif num_uses_left <= 0:
@@ -90,6 +93,8 @@ def use_package(package_id):
         flash('You have finished using this package.')
     else:
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
+        package_use = PackageUse(package_id=package_id)
+        db.session.add(package_use)
         db.session.commit()
         flash('Congrats! You have used this package')
     return render_template('customer_home.html', title='Home')

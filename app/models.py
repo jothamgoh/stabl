@@ -61,8 +61,8 @@ class Admin(User):
 
 class Package(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))
-    cust_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id')) # which admin created the package
+    cust_id = db.Column(db.Integer, db.ForeignKey('customer.id')) # which customer used the package
     package_name = db.Column(db.String(128))
     package_total_uses_at_start = db.Column(db.Integer) # number of total uses of package at the start
     package_uses_left_when_keyed = db.Column(db.Integer) # number of uses when package keyed in - for migration into stabl

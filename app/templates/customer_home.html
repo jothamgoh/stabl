@@ -12,7 +12,6 @@
 <p>Number of uses left: {{ package.num_uses_left }}</p>
 <p>Date package bought: {{ package.created_at }}</p>
 <p>Package status: {% if package.is_active == 1  %} Active {% else %} Inactive {% endif %}</p>
-<!-- <a href="{{ url_for('main.use_package', package_id=package.package_id) }}">Use Package</a> -->
 <a href="{{ url_for('main.use_package', package_id=package.package_id) }}"><button>Use Package</button></a>
 <br>
 <br>
