@@ -25,6 +25,10 @@
 <br>
 </div>
 
+{% if current_user.role=='customer' %}
 <a href="{{ url_for('main.customer_home') }}"><button>Return to home</button></a>
+{% else %}
+<a href="{{ url_for('main.port_customer_and_package') }}"><button>Port another package over</button></a>
+{% endif %}
 
 {% endblock %}

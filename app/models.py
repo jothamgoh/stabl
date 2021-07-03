@@ -71,6 +71,7 @@ class Package(db.Model):
     currency = db.Column(db.String(16), default='SGD')
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=1)
+    is_ported_over = db.Column(db.Boolean, default=0) # package was ported over
     package_usage = db.relationship('PackageUse', backref='package', lazy='dynamic')
 
     def __repr__(self):

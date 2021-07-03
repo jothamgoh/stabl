@@ -119,9 +119,9 @@ def customer_otp():
         if check_verification_token(phone, token):
             del session['phone']
             user = Customer.query.filter_by(phone=phone).first()
-            next_page = request.args.get('next')
             remember = request.args.get('remember', '0') == '1'
             login_user(user, remember=remember)
+            next_page = request.args.get('next')
             return redirect(next_page)
         else:
             flash(('Invalid OTP. Please key in again'))

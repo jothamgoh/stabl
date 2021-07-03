@@ -1,9 +1,10 @@
+from app.auth.forms import CustomerOTPForm
 from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
 from app.models import Customer, Package, PackageUse
-from app.main.forms import SearchCustomerForm, RegisterPackageForm
+from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm
 from app.helperfunc import check_and_clean_phone_number
 from flask_login import current_user
 from datetime import datetime
@@ -110,3 +111,40 @@ def display_package_summary(package_id):
     package_use_list = package.package_usage.order_by(PackageUse.created_at.desc()).all()
     package_use_data = [{'created_at': package_use.created_at} for package_use in package_use_list]
     return render_template('main/package_summary.html', title='Package Summary', package_data=package_data, package_use_data=package_use_data)
+
+
+@bp.route('/admin/port-package', methods=['GET', 'POST'])
+@login_required(role='admin')
+def port_customer_and_package():
+    form = PortCustomerAndPackageForm()
+    if form.validate_on_submit():
+        phone_number = check_and_clean_phone_number(form.phone.data)
+        customer = Customer.query.filter_by(phone=phone_number).first()
+        if customer is None: # customer does not currently exist. Create new customer
+            new_customer = Customer(
+                name=form.name.data,
+                phone=phone_number
+            )
+            db.session.add(new_customer)
+            db.session.flush()
+            cust_id = new_customer.id
+        else:
+            cust_id = customer.id
+
+        new_package  = Package(
+            admin_id=current_user.get_id(),
+            cust_id=cust_id,
+            package_name=form.package_name.data,
+            package_total_uses_at_start=form.package_total_uses_at_start.data,
+            package_uses_left_when_keyed=form.package_uses_left_when_keyed.data,
+            package_price_paid_in_cents=int((form.package_price_paid.data) * 100),
+            created_at=form.created_at.data,
+            is_ported_over = 1
+        )
+        db.session.add(new_package)
+        db.session.commit()
+
+        package_id=new_package.id
+        flash('Package successfully ported over. Please confirm details are correct.')
+        return redirect(url_for('main.display_package_summary', package_id=package_id))
+    return render_template('main/port_customer_and_package.html', title='Port package', form=form)
