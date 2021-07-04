@@ -31,11 +31,6 @@ class Customer(User):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def check_phone(self, phone):
-        number = phonenumbers.parse(phone, 'SG')
-        return phonenumbers.is_valid_number(number)
-
-
     __mapper_args__ = {
         'polymorphic_identity':'customer',
     }

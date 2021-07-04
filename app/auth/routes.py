@@ -8,7 +8,7 @@ from app.auth.forms import AdminLoginForm, AdminRegistrationForm, AdminResetPass
 from app.auth.email import send_password_reset_email
 from app.decorators import login_required
 from app.auth.twilio_verify import request_verification_token, check_verification_token
-from app.helperfunc import check_and_clean_phone_number
+from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message
 
 
 @bp.route('/login/admin', methods=['GET', 'POST'])
@@ -94,13 +94,17 @@ def customer_login_otp():
         return redirect(url_for('main.customer_home'))
     form = CustomerLoginOTPForm()
     if form.validate_on_submit():
-        phone_number = check_and_clean_phone_number(form.phone.data)
+        try:
+            phone_number = check_and_clean_phone_number(form.phone.data)
+        except:
+            flash (invalid_phone_number_message())
+            return redirect(url_for('auth.customer_login_otp'))
         user = Customer.query.filter_by(phone=phone_number).first()
-        if user is None or not user.check_phone(phone_number):
+        if user is None:
             flash(('Invalid phone number'))
             return redirect(url_for('auth.customer_login_otp'))
         request_verification_token(phone_number)
-        session['phone'] = check_and_clean_phone_number(phone_number)  
+        session['phone'] = phone_number  
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main.customer_home')
@@ -114,7 +118,7 @@ def customer_otp():
         return redirect(url_for('main.customer_home'))
     form = CustomerOTPForm()
     if form.validate_on_submit():
-        phone = check_and_clean_phone_number(session['phone'])
+        phone = session['phone']
         token = form.otp.data
         if check_verification_token(phone, token):
             del session['phone']
@@ -134,7 +138,12 @@ def customer_otp():
 def customer_register():
     form = CustomerRegistrationForm()
     if form.validate_on_submit():
-        user = Customer(name=form.name.data, email=form.email.data, phone=check_and_clean_phone_number(form.phone.data))
+        try:
+            phone_number = check_and_clean_phone_number(form.phone.data)
+        except:
+            flash (invalid_phone_number_message())
+            return redirect(url_for('auth.customer_register'))
+        user = Customer(name=form.name.data, email=form.email.data, phone=phone_number)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()

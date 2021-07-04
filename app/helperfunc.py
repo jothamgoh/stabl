@@ -12,3 +12,6 @@ def check_and_clean_phone_number(number):
         raise ValueError('Invalid phone number')
     except:
         raise ValueError('Invalid phone number')
+
+def invalid_phone_number_message():
+    return str('Phone number is not a valid Singapore number.')

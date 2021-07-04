@@ -5,9 +5,10 @@ from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
 from app.models import Customer, Package, PackageUse
 from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm
-from app.helperfunc import check_and_clean_phone_number
+from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message
 from flask_login import current_user
 from datetime import datetime
+
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
@@ -41,7 +42,7 @@ def search_for_customer():
             phone_number = check_and_clean_phone_number(form.phone_or_email.data) # if email, exception is raised. if phone number is invalid 'None' returned
             customer = Customer.query.filter_by(phone=phone_number).first()
             session['phone_or_email'] = phone_number
-        except: # case when customer keys in email 
+        except: # case when customer keys in email or if phone number is invalid
             customer = Customer.query.filter_by(email=form.phone_or_email.data).first()
             session['phone_or_email'] = form.phone_or_email.data
         if customer is None:
@@ -121,7 +122,7 @@ def port_customer_and_package():
         try:
             phone_number = check_and_clean_phone_number(form.phone.data)
         except:
-            flash ('Invalid phone number')
+            flash (invalid_phone_number_message())
             return redirect(url_for('main.port_customer_and_package'))
         customer = Customer.query.filter_by(phone=phone_number).first()
         if customer is None: # customer does not currently exist. Create new customer
