@@ -118,7 +118,11 @@ def display_package_summary(package_id):
 def port_customer_and_package():
     form = PortCustomerAndPackageForm()
     if form.validate_on_submit():
-        phone_number = check_and_clean_phone_number(form.phone.data)
+        try:
+            phone_number = check_and_clean_phone_number(form.phone.data)
+        except:
+            flash ('Invalid phone number')
+            return redirect(url_for('main.port_customer_and_package'))
         customer = Customer.query.filter_by(phone=phone_number).first()
         if customer is None: # customer does not currently exist. Create new customer
             new_customer = Customer(
