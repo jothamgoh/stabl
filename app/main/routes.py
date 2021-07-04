@@ -38,17 +38,16 @@ def search_for_customer():
     if form.validate_on_submit():
         # try to find customer using phone or email
         try: # case when customer keys in phone number
-            phone_number = check_and_clean_phone_number(form.phone_or_email.data)
+            phone_number = check_and_clean_phone_number(form.phone_or_email.data) # if email, exception is raised. if phone number is invalid 'None' returned
             customer = Customer.query.filter_by(phone=phone_number).first()
             session['phone_or_email'] = phone_number
         except: # case when customer keys in email 
             customer = Customer.query.filter_by(email=form.phone_or_email.data).first()
+            session['phone_or_email'] = form.phone_or_email.data
         if customer is None:
             flash(('Customer email or phone not found. Please try again'))
+            del session['phone_or_email']
             return redirect(url_for('main.search_for_customer'))
-        else:
-            if session['phone_or_email'] is None: # customer used email instead of phone
-                session['phone_or_email'] = form.phone_or_email.data
         session['cust_id'] = customer.id 
         return redirect(url_for('main.register_new_package'))
     return render_template('main/search_for_customer.html', title='Find customer', form=form)
