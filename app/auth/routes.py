@@ -1,10 +1,11 @@
 from flask import render_template, redirect, url_for, flash, request, session
+from twilio.rest import TwilioTaskRouterClient
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from app.auth import bp
 from app import db
 from app.models import Customer, User, Admin
-from app.auth.forms import AdminLoginForm, AdminRegistrationForm, AdminResetPasswordRequestForm, AdminResetPasswordForm, CustomerLoginOTPForm, CustomerRegistrationForm, CustomerOTPForm, CustomerLoginForm
+from app.auth.forms import AdminLoginForm, AdminRegistrationForm, AdminResetPasswordRequestForm, AdminResetPasswordForm, CustomerLoginOTPForm, CustomerRegistrationForm, CustomerOTPForm, CustomerLoginForm, InputEmailAndPasswordForm
 from app.auth.email import send_password_reset_email
 from app.decorators import login_required
 from app.auth.twilio_verify import request_verification_token, check_verification_token
@@ -77,8 +78,12 @@ def customer_login():
             user = Customer.query.filter_by(phone=phone_number).first()
         except:
             user = Customer.query.filter_by(email=form.phone_or_email.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash(('Invalid email, phone number or password'))
+        try:
+            if user is None or not user.check_password(form.password.data): # check password returns an error if password is not set. Hence try except block added in
+                flash(('Invalid email, phone number or password'))
+                return redirect(url_for('auth.customer_login'))
+        except:
+            flash(('Your password is not set. Login using your phone number and OTP instead.'))
             return redirect(url_for('auth.customer_login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -121,16 +126,34 @@ def customer_otp():
         phone = session['phone']
         token = form.otp.data
         if check_verification_token(phone, token):
-            del session['phone']
             user = Customer.query.filter_by(phone=phone).first()
             remember = request.args.get('remember', '0') == '1'
             login_user(user, remember=remember)
             next_page = request.args.get('next')
+            if user.email is None and user.password_hash is None:
+                return redirect(url_for('auth.set_email_and_password')) 
+            del session['phone']
             return redirect(next_page)
         else:
             flash(('Invalid OTP. Please key in again'))
             return redirect(url_for('auth.customer_otp'))
     return render_template('auth/customer_otp.html', title=('Key in One Time Password'), form=form)
+
+
+@bp.route('/set-email-and-password', methods=['GET', 'POST'])
+@login_required(role='customer')
+def set_email_and_password():
+    form = InputEmailAndPasswordForm()
+    if form.validate_on_submit():
+        current_user.name = form.name.data
+        current_user.email = form.email.data
+        current_user.set_password(form.password.data)
+        db.session.commit()
+        return redirect(url_for('main.customer_home'))
+    elif request.method == 'GET':
+        form.name.data = current_user.name
+    return render_template('auth/set_email_and_password.html', title=('Confirm email and password'), form=form)
+
 
 
 @bp.route('/register-customer', methods=['GET', 'POST'])

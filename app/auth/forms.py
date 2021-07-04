@@ -75,3 +75,13 @@ class CustomerRegistrationForm(FlaskForm):
         user = Customer.query.filter_by(phone=phone.data).first()
         if user is not None:
             raise ValidationError(('Phone number is already registered.'))
+
+
+class InputEmailAndPasswordForm(FlaskForm):
+    name = StringField(('Name'), validators=[DataRequired()])
+    email = StringField(('Email'), validators=[DataRequired(), Email()])
+    password = PasswordField(('Password'), validators=[DataRequired()])
+    password2 = PasswordField(
+        ('Repeat Password'), validators=[DataRequired(),
+                                           EqualTo('password')])
+    submit = SubmitField(('Confirm information'))
