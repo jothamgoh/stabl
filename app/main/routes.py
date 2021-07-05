@@ -63,8 +63,8 @@ def register_new_package():
             admin_id=current_user.get_id(), 
             cust_id=session['cust_id'],
             package_name=form.package_name.data,
-            package_total_uses_at_start=form.package_total_uses_at_start.data,
-            package_uses_left_when_keyed=form.package_uses_left_when_keyed.data,
+            package_num_total_uses_at_start=form.package_num_total_uses_at_start.data,
+            package_num_used_when_keyed=form.package_num_used_when_keyed.data,
             package_price_paid_in_cents=int((form.package_price_paid.data) * 100),
             )
         db.session.add(new_package)
@@ -80,7 +80,7 @@ def register_new_package():
 @login_required(role='customer')
 def use_package(package_id):
     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
-    num_uses_left = p.package_uses_left_when_keyed - p.package_num_times_used_after_keyed
+    num_uses_left = p.package_num_total_uses_at_start - p.package_num_used_when_keyed - p.package_num_times_used_after_keyed
     if num_uses_left == 1:
         p.is_active = 0
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
@@ -102,6 +102,13 @@ def use_package(package_id):
         flash('Congrats! You have used this package')
         return redirect(url_for('main.display_package_summary', package_id=package_id))
     return render_template('customer_home.html', title='Home')
+
+
+# @bp.route('/package/transfer-package/<package_id>', methods=['GET', 'POST'])
+# @login_required(role='customer')
+# def transfer_package(package_id):
+#     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
+#     num_uses_left = p.package_num_total_uses_at_start - p.package_num_used_when_keyed - p.package_num_times_used_after_keyed
 
 @bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])
 @login_required()
@@ -140,8 +147,8 @@ def port_customer_and_package():
             admin_id=current_user.get_id(),
             cust_id=cust_id,
             package_name=form.package_name.data,
-            package_total_uses_at_start=form.package_total_uses_at_start.data,
-            package_uses_left_when_keyed=form.package_uses_left_when_keyed.data,
+            package_num_total_uses_at_start=form.package_num_total_uses_at_start.data,
+            package_num_used_when_keyed=form.package_num_used_when_keyed.data,
             package_price_paid_in_cents=int((form.package_price_paid.data) * 100),
             created_at=form.created_at.data,
             is_ported_over = 1
@@ -153,3 +160,5 @@ def port_customer_and_package():
         flash('Package successfully ported over. Please confirm details are correct.')
         return redirect(url_for('main.display_package_summary', package_id=package_id))
     return render_template('main/port_customer_and_package.html', title='Port package', form=form)
+
+
