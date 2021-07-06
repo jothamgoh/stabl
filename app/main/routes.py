@@ -1,13 +1,11 @@
-from app.auth.forms import CustomerOTPForm
 from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
 from app.models import Customer, Package, PackageUse
-from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm
+from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message
 from flask_login import current_user
-from datetime import datetime
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -80,7 +78,7 @@ def register_new_package():
 @login_required(role='customer')
 def use_package(package_id):
     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
-    num_uses_left = p.package_num_total_uses_at_start - p.package_num_used_when_keyed - p.package_num_times_used_after_keyed
+    num_uses_left = p.package_num_total_uses_at_start - p.package_num_used_when_keyed - p.package_num_times_used_after_keyed - p.package_num_times_transferred
     if num_uses_left == 1:
         p.is_active = 0
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
@@ -108,7 +106,13 @@ def use_package(package_id):
 # @login_required(role='customer')
 # def transfer_package(package_id):
 #     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
-#     num_uses_left = p.package_num_total_uses_at_start - p.package_num_used_when_keyed - p.package_num_times_used_after_keyed
+#     num_uses_left = p.package_num_total_uses_at_start - p.package_num_used_when_keyed - p.package_num_times_used_after_keyed - p.package_num_times_transferred
+#     form = TransferPackageForm()
+#     if form.validate_on_submit():
+#         num_uses_to_transfer = form.num_package_uses.data
+#         if num_uses_left==num_uses_to_transfer:
+#             p.is_active = 0
+#             p.package_num_times_transferred = num_uses_to_transfer
 
 @bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])
 @login_required()

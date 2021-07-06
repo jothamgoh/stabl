@@ -80,7 +80,7 @@ class Package(db.Model):
             'package_id': self.id,
             'package_num_total_uses_at_start': self.package_num_total_uses_at_start,
             'package_name': self.package_name,
-            'num_uses_left': (self.package_num_total_uses_at_start - self.package_num_used_when_keyed - self.package_num_times_used_after_keyed),
+            'num_uses_left': (self.package_num_total_uses_at_start - self.package_num_used_when_keyed - self.package_num_times_used_after_keyed - self.package_num_times_transferred),
             'created_at': self.created_at,
             'currency': self.currency,
             'package_price_paid_in_cents': self.package_price_paid_in_cents,

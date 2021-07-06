@@ -29,3 +29,8 @@ class PortCustomerAndPackageForm(FlaskForm):
     package_price_paid = DecimalField(('Price Paid for Package (SGD)'), places=2)
     created_at = DateField('Date Package Created (YYYY-MM-DD e.g. 2021-01-30)', format='%Y-%m-%d')
     submit = SubmitField(('Port new package'))
+
+
+class TransferPackageForm(FlaskForm):
+    phone = StringField(('Phone Number to transfer to'), validators=[DataRequired()])
+    num_package_uses = IntegerField(('No. package uses to transfer'), validators=[DataRequired()])
