@@ -60,7 +60,7 @@ class Package(db.Model):
     cust_id = db.Column(db.Integer, db.ForeignKey('customer.id')) # which customer used the package
     package_name = db.Column(db.String(128))
     package_num_total_uses_at_start = db.Column(db.Integer) # number of total uses of package at the start
-    package_num_used_when_keyed = db.Column(db.Integer) # number of uses when package keyed in
+    package_num_used_when_keyed = db.Column(db.Integer, default=0) # number of uses when package keyed in
     package_num_times_used_after_keyed = db.Column(db.Integer, default=0) # number of times customer used package after migration into stabl
     package_num_times_transferred = db.Column(db.Integer, default=0) # number of times customer had transferred the package to their friend
     package_price_paid_in_cents = db.Column(db.Integer) # price customer paid

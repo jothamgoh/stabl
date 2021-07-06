@@ -1,8 +1,8 @@
 """initial migration
 
-Revision ID: 00fc4690b2ad
+Revision ID: 72bcaf1b5e86
 Revises: 
-Create Date: 2021-06-30 17:12:58.719663
+Create Date: 2021-07-06 23:56:32.683581
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '00fc4690b2ad'
+revision = '72bcaf1b5e86'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -53,13 +53,17 @@ def upgrade():
     sa.Column('admin_id', sa.Integer(), nullable=True),
     sa.Column('cust_id', sa.Integer(), nullable=True),
     sa.Column('package_name', sa.String(length=128), nullable=True),
-    sa.Column('package_total_uses_at_start', sa.Integer(), nullable=True),
-    sa.Column('package_uses_left_when_keyed', sa.Integer(), nullable=True),
+    sa.Column('package_num_total_uses_at_start', sa.Integer(), nullable=True),
+    sa.Column('package_num_used_when_keyed', sa.Integer(), nullable=True),
     sa.Column('package_num_times_used_after_keyed', sa.Integer(), nullable=True),
+    sa.Column('package_num_times_transferred', sa.Integer(), nullable=True),
     sa.Column('package_price_paid_in_cents', sa.Integer(), nullable=True),
     sa.Column('currency', sa.String(length=16), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('is_ported_over', sa.Boolean(), nullable=True),
+    sa.Column('is_transferred', sa.Boolean(), nullable=True),
+    sa.Column('transferred_from_phone_number', sa.String(length=64), nullable=True),
     sa.ForeignKeyConstraint(['admin_id'], ['admin.id'], ),
     sa.ForeignKeyConstraint(['cust_id'], ['customer.id'], ),
     sa.PrimaryKeyConstraint('id')
