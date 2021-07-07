@@ -4,7 +4,7 @@ from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
 from app.models import Customer, Package, PackageUse
 from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
-from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message
+from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 
 
@@ -78,7 +78,7 @@ def register_new_package():
 @login_required(role='customer')
 def use_package(package_id):
     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
-    num_uses_left = p.package_num_total_uses_at_start - p.package_num_used_when_keyed - p.package_num_times_used_after_keyed - p.package_num_times_transferred
+    num_uses_left = p.num_uses_left()
     if num_uses_left == 1:
         p.is_active = 0
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
@@ -102,17 +102,25 @@ def use_package(package_id):
     return render_template('customer_home.html', title='Home')
 
 
-# @bp.route('/package/transfer-package/<package_id>', methods=['GET', 'POST'])
-# @login_required(role='customer')
-# def transfer_package(package_id):
-#     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
-#     num_uses_left = p.package_num_total_uses_at_start - p.package_num_used_when_keyed - p.package_num_times_used_after_keyed - p.package_num_times_transferred
-#     form = TransferPackageForm()
-#     if form.validate_on_submit():
-#         num_uses_to_transfer = form.num_package_uses.data
-#         if num_uses_left==num_uses_to_transfer:
-#             p.is_active = 0
-#             p.package_num_times_transferred = num_uses_to_transfer
+@bp.route('/package/transfer-package/<package_id>', methods=['GET', 'POST'])
+@login_required(role='customer')
+def transfer_package(package_id):
+    p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
+    num_uses_left = p.num_uses_left()
+    form = TransferPackageForm()
+    if form.validate_on_submit():
+        num_uses_to_transfer = form.num_uses_to_transfer.data
+        if num_uses_left==num_uses_to_transfer:
+            p.is_active = 0
+            p.package_num_times_transferred = num_uses_to_transfer
+            # create new customer, create new package for transferee and assign package
+        elif num_uses_left > num_uses_to_transfer:
+            p.package_num_times_transferred = num_uses_to_transfer
+        else:
+            flash('You cannot transfer more uses than what you have. Please try again')
+            return redirect(url_for('main.transfer_package', package_id=package_id))
+
+        
 
 @bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])
 @login_required()
@@ -135,18 +143,7 @@ def port_customer_and_package():
         except:
             flash (invalid_phone_number_message())
             return redirect(url_for('main.port_customer_and_package'))
-        customer = Customer.query.filter_by(phone=phone_number).first()
-        if customer is None: # customer does not currently exist. Create new customer
-            new_customer = Customer(
-                name=form.name.data,
-                phone=phone_number
-            )
-            db.session.add(new_customer)
-            db.session.flush()
-            cust_id = new_customer.id
-        else:
-            cust_id = customer.id
-
+        cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number, name=form.name.data)
         new_package  = Package(
             admin_id=current_user.get_id(),
             cust_id=cust_id,

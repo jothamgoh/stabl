@@ -33,4 +33,4 @@ class PortCustomerAndPackageForm(FlaskForm):
 
 class TransferPackageForm(FlaskForm):
     phone = StringField(('Phone Number to transfer to'), validators=[DataRequired()])
-    num_package_uses = IntegerField(('No. package uses to transfer'), validators=[DataRequired()])
+    num_uses_to_transfer = IntegerField(('No. package uses to transfer'), validators=[DataRequired()])

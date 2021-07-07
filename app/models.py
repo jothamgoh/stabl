@@ -87,6 +87,9 @@ class Package(db.Model):
             'is_active': self.is_active
         }
 
+    def num_uses_left(self):
+        return (self.package_num_total_uses_at_start - self.package_num_used_when_keyed - self.package_num_times_used_after_keyed - self.package_num_times_transferred)
+
 
 class PackageUse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
