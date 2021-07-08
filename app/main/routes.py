@@ -115,8 +115,8 @@ def transfer_package(package_id):
         except:
             flash(invalid_phone_number_message())
             return redirect(url_for('main.transfer_package', package_id=package_id))
-        # if phone_number == current_user.phone:
-        #     flash('You cannot transfer a package to your own phone number.')
+        if phone_number == current_user.phone:
+            flash('You cannot transfer a package to your own phone number.')
             return redirect(url_for('main.transfer_package', package_id=package_id))
         num_uses_to_transfer = form.num_uses_to_transfer.data
         if num_uses_left < num_uses_to_transfer: # not possible, redirect to same page
@@ -142,6 +142,8 @@ def transfer_package(package_id):
             return redirect(url_for('main.customer_home'))
     return render_template('main/transfer_package.html', title='Transfer package to a friend', form=form, package_data=package_data) 
         
+
+
 
 @bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])
 @login_required()
