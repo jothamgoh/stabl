@@ -8,9 +8,8 @@
 <br>
 
 <div class="package">
-<h4><b>{{ package_data.package_name }}</b></h4>
+<h4><b>{{ package_data.package_name }}: {{ package_data.num_uses_left }} uses left</b></h4>
 <p>Total sessions bought: {{ package_data.package_num_total_uses_at_start }}</p>
-<p>Number of uses left: {{ package_data.num_uses_left }}</p>
 <p>Date package bought: {{ package_data.created_at }}</p> 
 <p>Price paid: {{ package_data.currency }} {{ package_data.package_price_paid_in_cents / 100}}</p>
 <p>Package status: {% if package_data.is_active == 1  %} Active {% else %} Inactive {% endif %}</p>

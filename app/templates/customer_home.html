@@ -7,12 +7,11 @@
 
 {% for package in package_data %}
 <div class="package">
-<h4><b>{{ package.package_name }}</b></h4>
+<h4><b>{{ package.package_name }}: {{ package.num_uses_left }} uses left</b></h4>
 <p>Total sessions bought: {{ package.package_num_total_uses_at_start }}</p>
 <p>package_num_used_when_keyed: {{ package.package_num_used_when_keyed }}</p>
 <p>package_num_times_used_after_keyed: {{ package.package_num_times_used_after_keyed }}</p>
 <p>package_num_times_transferred: {{ package.package_num_times_transferred }}</p>
-<p>Number of uses left: {{ package.num_uses_left }}</p>
 <p>Date package bought: {{ package.created_at }}</p>
 <p>Package status: {% if package.is_active == 1  %} Active {% else %} Inactive {% endif %}</p>
 <a href="{{ url_for('main.use_package', package_id=package.package_id) }}"><button>Use Package</button></a>
