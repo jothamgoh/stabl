@@ -115,6 +115,9 @@ def transfer_package(package_id):
         except:
             flash(invalid_phone_number_message())
             return redirect(url_for('main.transfer_package', package_id=package_id))
+        # if phone_number == current_user.phone:
+        #     flash('You cannot transfer a package to your own phone number.')
+            return redirect(url_for('main.transfer_package', package_id=package_id))
         num_uses_to_transfer = form.num_uses_to_transfer.data
         if num_uses_left < num_uses_to_transfer: # not possible, redirect to same page
             flash('You cannot transfer more uses than what you have. Please try again')
@@ -122,7 +125,7 @@ def transfer_package(package_id):
         else: 
             if num_uses_left==num_uses_to_transfer:
                 p.is_active = 0
-            p.package_num_times_transferred = num_uses_to_transfer
+            p.package_num_times_transferred += num_uses_to_transfer
             cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
             new_package_for_transferee = Package(
                 admin_id=None,
@@ -135,7 +138,7 @@ def transfer_package(package_id):
             )
             db.session.add(new_package_for_transferee)
             db.session.commit()
-            flash('You have transferred {} package/s to phone number: {}'.format())
+            flash('You have transferred {} package/s to phone number: {}'.format(num_uses_to_transfer, phone_number))
             return redirect(url_for('main.customer_home'))
     return render_template('main/transfer_package.html', title='Transfer package to a friend', form=form, package_data=package_data) 
         

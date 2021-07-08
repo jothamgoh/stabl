@@ -75,20 +75,24 @@ class Package(db.Model):
     def __repr__(self):
         return '<Package {}>'.format(self.id)
 
+    def num_uses_left(self):
+        return (self.package_num_total_uses_at_start - self.package_num_used_when_keyed - self.package_num_times_used_after_keyed - self.package_num_times_transferred)
+
     def list_customer_package_data(self):
         return {
             'package_id': self.id,
-            'package_num_total_uses_at_start': self.package_num_total_uses_at_start,
             'package_name': self.package_name,
-            'num_uses_left': (self.package_num_total_uses_at_start - self.package_num_used_when_keyed - self.package_num_times_used_after_keyed - self.package_num_times_transferred),
+            'package_num_total_uses_at_start': self.package_num_total_uses_at_start,
+            'package_num_used_when_keyed': self.package_num_used_when_keyed,
+            'package_num_times_used_after_keyed': self.package_num_times_used_after_keyed,
+            'package_num_times_transferred': self.package_num_times_transferred,
+            'num_uses_left': (self.num_uses_left()),
             'created_at': self.created_at,
             'currency': self.currency,
             'package_price_paid_in_cents': self.package_price_paid_in_cents,
             'is_active': self.is_active
         }
 
-    def num_uses_left(self):
-        return (self.package_num_total_uses_at_start - self.package_num_used_when_keyed - self.package_num_times_used_after_keyed - self.package_num_times_transferred)
 
 
 class PackageUse(db.Model):
