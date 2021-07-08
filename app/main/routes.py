@@ -106,20 +106,38 @@ def use_package(package_id):
 @login_required(role='customer')
 def transfer_package(package_id):
     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
+    package_data = p.list_customer_package_data()
     num_uses_left = p.num_uses_left()
     form = TransferPackageForm()
     if form.validate_on_submit():
+        try: # validate phone number
+            phone_number = check_and_clean_phone_number(form.phone.data)
+        except:
+            flash(invalid_phone_number_message())
+            return redirect(url_for('main.transfer_package', package_id=package_id))
         num_uses_to_transfer = form.num_uses_to_transfer.data
-        if num_uses_left==num_uses_to_transfer:
-            p.is_active = 0
-            p.package_num_times_transferred = num_uses_to_transfer
-            # create new customer, create new package for transferee and assign package
-        elif num_uses_left > num_uses_to_transfer:
-            p.package_num_times_transferred = num_uses_to_transfer
-        else:
+        if num_uses_left < num_uses_to_transfer: # not possible, redirect to same page
             flash('You cannot transfer more uses than what you have. Please try again')
             return redirect(url_for('main.transfer_package', package_id=package_id))
-
+        else: 
+            if num_uses_left==num_uses_to_transfer:
+                p.is_active = 0
+            p.package_num_times_transferred = num_uses_to_transfer
+            cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
+            new_package_for_transferee = Package(
+                admin_id=None,
+                cust_id=cust_id,
+                package_name=p.package_name,
+                package_num_total_uses_at_start=num_uses_to_transfer,
+                package_price_paid_in_cents=0,
+                is_transferred=1,
+                transferred_from_phone_number=current_user.phone
+            )
+            db.session.add(new_package_for_transferee)
+            db.session.commit()
+            flash('You have transferred {} package/s to phone number: {}'.format())
+            return redirect(url_for('main.customer_home'))
+    return render_template('main/transfer_package.html', title='Transfer package to a friend', form=form, package_data=package_data) 
         
 
 @bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])

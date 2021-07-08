@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>{{ title }}</h1>
+    <br>
+    <p><b>Package you're transferring:</b> {{ package_data.package_name }}</p>
+    <p><b>Number of uses left:</b> {{ package_data.num_uses_left }}</p>
+    <br>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+        
+    </div>
+    <br>
+{% endblock %}

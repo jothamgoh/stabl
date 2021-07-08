@@ -56,14 +56,14 @@ class Admin(User):
 
 class Package(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id')) # which admin created the package
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=True) # which admin created the package
     cust_id = db.Column(db.Integer, db.ForeignKey('customer.id')) # which customer used the package
     package_name = db.Column(db.String(128))
     package_num_total_uses_at_start = db.Column(db.Integer) # number of total uses of package at the start
     package_num_used_when_keyed = db.Column(db.Integer, default=0) # number of uses when package keyed in
     package_num_times_used_after_keyed = db.Column(db.Integer, default=0) # number of times customer used package after migration into stabl
     package_num_times_transferred = db.Column(db.Integer, default=0) # number of times customer had transferred the package to their friend
-    package_price_paid_in_cents = db.Column(db.Integer) # price customer paid
+    package_price_paid_in_cents = db.Column(db.Integer, nullable=True) # price customer paid
     currency = db.Column(db.String(16), default='SGD')
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=1)
