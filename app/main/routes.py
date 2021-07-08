@@ -85,20 +85,14 @@ def register_new_package():
 def use_package(package_id):
     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
     num_uses_left = p.num_uses_left()
-    if num_uses_left == 1:
-        p.is_active = 0
-        p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
-        package_use = PackageUse(package_id=package_id)
-        db.session.add(package_use)
-        db.session.commit()
-        flash('Congrats! You have succesfully used this package. This package is finished and is now inactive.')
-        return redirect(url_for('main.display_package_summary', package_id=package_id))
-    elif num_uses_left <= 0:
+    if num_uses_left <= 0:
         p.is_active = 0
         db.session.commit()
         flash('You have finished using this package.')
         return redirect(url_for('main.display_package_summary', package_id=package_id))
     else:
+        if num_uses_left == 1:
+            p.is_active = 0
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
         package_use = PackageUse(package_id=package_id)
         db.session.add(package_use)
