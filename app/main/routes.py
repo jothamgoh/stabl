@@ -57,13 +57,19 @@ def search_for_customer():
 def register_new_package():
     form = RegisterPackageForm()
     if form.validate_on_submit():
+        package_num_total_uses_at_start = form.package_num_total_uses_at_start.data
+        package_num_used_when_keyed = form.package_num_used_when_keyed.data
+        package_price_paid_in_cents = int((form.package_price_paid.data) * 100)
+        if package_num_total_uses_at_start <= package_num_used_when_keyed or package_price_paid_in_cents < 0:
+            flash(('The data you entered does not make sense. Please check and try again.'))
+            return redirect(url_for('main.register_new_package'))
         new_package = Package(
             admin_id=current_user.get_id(), 
             cust_id=session['cust_id'],
             package_name=form.package_name.data,
-            package_num_total_uses_at_start=form.package_num_total_uses_at_start.data,
-            package_num_used_when_keyed=form.package_num_used_when_keyed.data,
-            package_price_paid_in_cents=int((form.package_price_paid.data) * 100),
+            package_num_total_uses_at_start=package_num_total_uses_at_start,
+            package_num_used_when_keyed=package_num_used_when_keyed,
+            package_price_paid_in_cents=package_price_paid_in_cents
             )
         db.session.add(new_package)
         db.session.commit()
@@ -141,8 +147,6 @@ def transfer_package(package_id):
             flash('You have transferred {} package/s to phone number: {}'.format(num_uses_to_transfer, phone_number))
             return redirect(url_for('main.customer_home'))
     return render_template('main/transfer_package.html', title='Transfer package to a friend', form=form, package_data=package_data) 
-        
-
 
 
 @bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])
