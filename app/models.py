@@ -69,7 +69,7 @@ class Package(db.Model):
     is_active = db.Column(db.Boolean, default=1)
     is_ported_over = db.Column(db.Boolean, default=0) # package was ported over by an admin
     is_transferred = db.Column(db.Boolean, default=0) # package was transferred from another customer
-    transferred_from_phone_number = db.Column(db.String(64), nullable=True) # phone number of the customer who transferred package
+    transferred_from_package_id = db.Column(db.Integer, nullable=True) # phone number of the customer who transferred package
     package_usage = db.relationship('PackageUse', backref='package', lazy='dynamic')
 
     def __repr__(self):

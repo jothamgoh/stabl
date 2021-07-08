@@ -134,7 +134,7 @@ def transfer_package(package_id):
                 package_num_total_uses_at_start=num_uses_to_transfer,
                 package_price_paid_in_cents=0,
                 is_transferred=1,
-                transferred_from_phone_number=current_user.phone
+                transferred_from_package_id=package_id
             )
             db.session.add(new_package_for_transferee)
             db.session.commit()

@@ -1,8 +1,8 @@
 """initial migration
 
-Revision ID: 72bcaf1b5e86
+Revision ID: 5a996243c95e
 Revises: 
-Create Date: 2021-07-06 23:56:32.683581
+Create Date: 2021-07-09 00:04:55.385683
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '72bcaf1b5e86'
+revision = '5a996243c95e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -63,7 +63,7 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('is_ported_over', sa.Boolean(), nullable=True),
     sa.Column('is_transferred', sa.Boolean(), nullable=True),
-    sa.Column('transferred_from_phone_number', sa.String(length=64), nullable=True),
+    sa.Column('transferred_from_package_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['admin_id'], ['admin.id'], ),
     sa.ForeignKeyConstraint(['cust_id'], ['customer.id'], ),
     sa.PrimaryKeyConstraint('id')
