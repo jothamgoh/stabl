@@ -1,21 +1,27 @@
-from sqlalchemy.orm import backref
 from app import db, login
+from flask import current_app
 from datetime import datetime
-from flask_login import UserMixin, current_user
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-import phonenumbers
-from flask import jsonify
+import jwt
+from time import time
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     role = db.Column(db.String(15))
 
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            current_app.config['SECRET_KEY'],
+            algorithm='HS256').decode('utf-8')
+
     __mapper_args__ = {
         'polymorphic_identity': 'user',
         'polymorphic_on': role
     }
-
 
 class Customer(User):
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
@@ -30,6 +36,15 @@ class Customer(User):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return Customer.query.get(id)
 
     __mapper_args__ = {
         'polymorphic_identity':'customer',
@@ -48,6 +63,15 @@ class Admin(User):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return Admin.query.get(id)
 
     __mapper_args__ = {
         'polymorphic_identity':'admin',
