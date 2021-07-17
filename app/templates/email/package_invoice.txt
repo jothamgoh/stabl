@@ -1,0 +1,3 @@
+Dear {{ user.name }},
+
+This is your package invoice in text

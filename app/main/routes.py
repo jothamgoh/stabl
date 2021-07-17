@@ -6,6 +6,7 @@ from app.models import Customer, Package, PackageUse
 from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
+from app.main.email import send_package_invoice_email
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -183,4 +184,11 @@ def port_customer_and_package():
         return redirect(url_for('main.display_package_summary', package_id=package_id))
     return render_template('main/port_customer_and_package.html', title='Port package', form=form)
 
+
+@bp.route('/package_invoice', methods=['GET', 'POST'])
+@login_required(role='customer')
+def send_package_invoice():
+    send_package_invoice_email(current_user)
+    flash('Package invoice email successfully sent. Please check {}'.format(current_user.email))
+    return render_template('email/package_invoice.html', title='Invoice')
 
