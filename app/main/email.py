@@ -10,3 +10,13 @@ def send_package_invoice_email(user):
                                          user=user),
                html_body=render_template('email/package_invoice.html',
                                          user=user))
+
+
+
+# route for sending invoice using email -> to be used in main/routes.py
+# @bp.route('/email_package_invoice', methods=['GET', 'POST'])
+# @login_required(role='customer')
+# def send_package_invoice():
+#     send_package_invoice_email(current_user)
+#     flash('Package invoice email successfully sent. Please check {}'.format(current_user.email))
+#     return render_template('email/package_invoice.html', title='Invoice')

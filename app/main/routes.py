@@ -77,6 +77,7 @@ def register_new_package():
         del session['cust_id']
         flash(('You have created a package for customer with phone/email: {}'.format(session['phone_or_email'])))
         del session['phone_or_email']
+        send_package_invoice_email(current_user)
         return redirect(url_for('main.admin_home'))
     return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
@@ -185,10 +186,9 @@ def port_customer_and_package():
     return render_template('main/port_customer_and_package.html', title='Port package', form=form)
 
 
-@bp.route('/package_invoice', methods=['GET', 'POST'])
+@bp.route('/package-invoice/<package_id>', methods=['GET'])
 @login_required(role='customer')
-def send_package_invoice():
-    send_package_invoice_email(current_user)
-    flash('Package invoice email successfully sent. Please check {}'.format(current_user.email))
-    return render_template('email/package_invoice.html', title='Invoice')
-
+def display_package_invoice(package_id):
+    p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
+    package_data = p.list_customer_package_data()
+    return render_template('main/package_invoice.html', title='Invoice', package_data=package_data)

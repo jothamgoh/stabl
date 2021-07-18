@@ -3,8 +3,6 @@
 
 {% block app_content %}
 <h1>Hi {{ current_user.name }}</h1>
-<a href="{{ url_for('main.send_package_invoice') }}">Send Package Invoice</a>
-
 
 {% for package in package_data %}
 <div class="package">
@@ -17,6 +15,7 @@
 <p>Package status: {% if package.is_active == 1  %} Active {% else %} Inactive {% endif %}</p>
 <a href="{{ url_for('main.use_package', package_id=package.package_id) }}"><button>Use Package</button></a>
 <a href="{{ url_for('main.transfer_package', package_id=package.package_id) }}"><button>Transfer Package</button></a>
+<a href="{{ url_for('main.display_package_invoice', package_id=package.package_id) }}"><button>Invoice</button></a>
 <br>
 <br>
 </div>

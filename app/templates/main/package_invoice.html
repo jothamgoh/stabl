@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{% block app_content %}
+
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='package_invoice.css') }}">
+<div class="container">
+    <div class="row">
+                        <!-- BEGIN INVOICE -->
+                        <div class="col-xs-12">
+                            <div class="grid invoice">
+                                <div class="grid-body">
+                                    <div class="invoice-title">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <img src="http://vergo-kertas.herokuapp.com/assets/img/logo.png" alt="" height="35">
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <h2>invoice<br>
+                                            <span class="small">order # {{ package_data.package_id }} </span></h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <address>
+                                                <strong>Billed To:</strong><br>
+                                                {{ current_user.name }}<br>
+                                                {{ current_user.email }}<br>
+                                                {{ current_user.phone }}<br>
+                                            </address>
+                                        </div>
+                                        <div class="col-xs-6 text-right">
+                                            <address>
+                                                <strong>Order Date:</strong><br>
+                                                17/06/14
+                                            </address>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h3>ORDER SUMMARY</h3>
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr class="line">
+                                                        <td><strong>#</strong></td>
+                                                        <td class="text-center"><strong>PACKAGE</strong></td>
+                                                        <td class="text-center"><strong>USES</strong></td>
+                                                        <td class="text-center"><strong>AMT PER USE</strong></td>
+                                                        <td class="text-center"><strong>SUBTOTAL</strong></td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td class="text-center"><strong>{{ package_data.package_name }}</strong></td>
+                                                        <td class="text-center">{{ package_data.package_num_total_uses_at_start }}</td>
+                                                        <td class="text-center">{{ package_data.currency }} {{ package_data.package_price_paid_in_cents / package_data.package_num_total_uses_at_start / 100}} </td>
+                                                        <td class="text-center">{{ package_data.currency }} {{ package_data.package_price_paid_in_cents / 100 }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3"></td>
+                                                        <td class="text-right"><strong>Taxes</strong></td>
+                                                        <td class="text-center"><strong>N/A</strong></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3">
+                                                        </td><td class="text-right"><strong>Total</strong></td>
+                                                        <td class="text-center"><strong>{{ package_data.currency }} {{ package_data.package_price_paid_in_cents / 100 }}</strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>									
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END INVOICE -->
+                    </div>
+    </div>
+
+{% endblock %}
