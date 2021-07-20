@@ -2,7 +2,6 @@ from flask.app import Flask
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField, DecimalField, DateField
 from wtforms.validators import ValidationError, DataRequired, InputRequired
-from app.models import Admin, Customer, Package, PackageUse
 from app.helperfunc import check_and_clean_phone_number
 
 package_choices = ['Haircut men', 'Haircut women']
