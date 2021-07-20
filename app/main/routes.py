@@ -3,7 +3,7 @@ from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
 from app.models import Company, Customer, Package, PackageUse
-from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
+from app.main.forms import RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -29,35 +29,15 @@ def customer_home():
     packages = Package.query.filter_by(cust_id=current_user.id).all()
     package_data = [package.list_customer_package_data() for package in packages]
     return render_template('customer_home.html', title='Home', package_data=package_data)
-
-
-@bp.route('/admin/search-customer', methods=['GET', 'POST'])
-@login_required(role='admin')
-def search_for_customer(): # this does not filter customer by company. This filters every customer in the database with Stabl
-    form = SearchCustomerForm()
-    if form.validate_on_submit():
-        # try to find customer using phone or email
-        try: # case when customer keys in phone number
-            phone_number = check_and_clean_phone_number(form.phone_or_email.data) # if email, exception is raised. if phone number is invalid 'None' returned
-            customer = Customer.query.filter_by(phone=phone_number).first()
-            session['phone_or_email'] = phone_number
-        except: # case when customer keys in email or if phone number is invalid
-            customer = Customer.query.filter_by(email=form.phone_or_email.data).first()
-            session['phone_or_email'] = form.phone_or_email.data
-        if customer is None:
-            flash(('Customer email or phone not found. Please try again'))
-            del session['phone_or_email']
-            return redirect(url_for('main.search_for_customer'))
-        session['cust_id'] = customer.id 
-        return redirect(url_for('main.register_new_package'))
-    return render_template('main/search_for_customer.html', title='Find customer', form=form)
-
+    
 
 @bp.route('/admin/new-package', methods=['GET', 'POST'])
 @login_required(role='admin')
 def register_new_package():
     form = RegisterPackageForm()
     if form.validate_on_submit():
+        phone_number = check_and_clean_phone_number(form.phone.data)
+        cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
         package_num_total_uses_at_start = form.package_num_total_uses_at_start.data
         package_num_used_when_keyed = form.package_num_used_when_keyed.data
         package_price_paid_in_cents = int((form.package_price_paid.data) * 100)
@@ -67,7 +47,7 @@ def register_new_package():
             return redirect(url_for('main.register_new_package'))
         new_package = Package(
             admin_id=current_user.get_id(), 
-            cust_id=session['cust_id'],
+            cust_id=cust_id,
             company_id=company_id,
             package_name=form.package_name.data,
             package_num_total_uses_at_start=package_num_total_uses_at_start,
@@ -76,9 +56,7 @@ def register_new_package():
             )
         db.session.add(new_package)
         db.session.commit()
-        del session['cust_id']
-        flash(('You have created a package for customer with phone/email: {}'.format(session['phone_or_email'])))
-        del session['phone_or_email']
+        flash(('You have created a package for customer with phone number: {}'.format(phone_number)))
         # send_package_invoice_email(current_user)
         return redirect(url_for('main.admin_home'))
     return render_template('main/register_new_package.html', title='Key in package details', form=form)
@@ -188,3 +166,26 @@ def display_package_invoice(package_id):
     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
     package_data = p.list_customer_package_data()
     return render_template('main/package_invoice.html', title='Invoice', package_data=package_data)
+
+
+
+# @bp.route('/admin/search-customer', methods=['GET', 'POST'])
+# @login_required(role='admin')
+# def search_for_customer(): # this does not filter customer by company. This filters every customer in the database with Stabl
+#     form = SearchCustomerForm()
+#     if form.validate_on_submit():
+#         # try to find customer using phone or email
+#         try: # case when customer keys in phone number
+#             phone_number = check_and_clean_phone_number(form.phone_or_email.data) # if email, exception is raised. if phone number is invalid 'None' returned
+#             customer = Customer.query.filter_by(phone=phone_number).first()
+#             session['phone_or_email'] = phone_number
+#         except: # case when customer keys in email or if phone number is invalid
+#             customer = Customer.query.filter_by(email=form.phone_or_email.data).first()
+#             session['phone_or_email'] = form.phone_or_email.data
+#         if customer is None:
+#             flash(('Customer email or phone not found. Please try again'))
+#             del session['phone_or_email']
+#             return redirect(url_for('main.search_for_customer'))
+#         session['cust_id'] = customer.id 
+#         return redirect(url_for('main.register_new_package'))
+#     return render_template('main/search_for_customer.html', title='Find customer', form=form)

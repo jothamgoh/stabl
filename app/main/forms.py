@@ -7,17 +7,19 @@ from app.helperfunc import check_and_clean_phone_number
 
 package_choices = ['Haircut men', 'Haircut women']
 
-class SearchCustomerForm(FlaskForm):
-    phone_or_email = StringField(('Phone Number or Email'), validators=[DataRequired()])
-    submit = SubmitField(('Search for Customer'))
-
-
 class RegisterPackageForm(FlaskForm):
+    phone = StringField(('Customer Phone Number'), validators=[DataRequired()])
     package_name = SelectField(('Package Name'), validators=[DataRequired()], choices=package_choices)
     package_num_total_uses_at_start = IntegerField(('No. times package can be used'), validators=[DataRequired()])
     package_num_used_when_keyed = IntegerField(('No. times package has already been used'), validators=[InputRequired()])
     package_price_paid = DecimalField(('Price Paid for Package (SGD)'), validators=[InputRequired()], places=2)
     submit = SubmitField(('Register package for customer'))
+
+    def validate_phone(self, phone):
+        try:
+            check_and_clean_phone_number(phone.data)
+        except:
+            raise ValidationError(('Phone number is not valid'))
 
 
 class PortCustomerAndPackageForm(FlaskForm):
@@ -47,3 +49,8 @@ class TransferPackageForm(FlaskForm):
             check_and_clean_phone_number(phone.data)
         except:
             raise ValidationError(('Phone number is not valid'))
+
+
+# class SearchCustomerForm(FlaskForm):
+#     phone_or_email = StringField(('Phone Number or Email'), validators=[DataRequired()])
+#     submit = SubmitField(('Search for Customer'))
