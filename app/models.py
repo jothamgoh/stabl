@@ -1,3 +1,4 @@
+from sqlalchemy.orm import backref
 from app import db, login
 from flask import current_app
 from datetime import datetime
@@ -5,6 +6,12 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from time import time
+
+class Company(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    admin = db.relationship('Admin', backref='company', lazy='dynamic')
+    package = db.relationship('Package', backref='company', lazy='dynamic')
 
 
 class User(UserMixin, db.Model):
@@ -53,10 +60,12 @@ class Customer(User):
 
 class Admin(User):
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this admin belong to
     name = db.Column(db.String(64))
     email = db.Column(db.String(120), index=True, unique=True)    
     password_hash = db.Column(db.String(128))
     package_sold = db.relationship('Package', backref='admin', lazy='dynamic')
+
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -82,6 +91,7 @@ class Package(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=True) # which admin created the package
     cust_id = db.Column(db.Integer, db.ForeignKey('customer.id')) # which customer used the package
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this admin belong to
     package_name = db.Column(db.String(128))
     package_num_total_uses_at_start = db.Column(db.Integer) # number of total uses of package at the start
     package_num_used_when_keyed = db.Column(db.Integer, default=0) # number of uses when package keyed in
