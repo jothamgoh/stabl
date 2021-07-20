@@ -41,7 +41,7 @@ def logout():
 def admin_register():
     form = AdminRegistrationForm()
     if form.validate_on_submit():
-        user = Admin(name=form.name.data, email=form.email.data)
+        user = Admin(name=form.name.data, email=form.email.data, company_id=current_user.company_id)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
