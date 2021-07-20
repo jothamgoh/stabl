@@ -13,6 +13,8 @@ class Company(db.Model):
     admin = db.relationship('Admin', backref='company', lazy='dynamic')
     package = db.relationship('Package', backref='company', lazy='dynamic')
 
+    def __repr__(self):
+        return '{}'.format(self.name)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -115,7 +117,7 @@ class Package(db.Model):
     def list_customer_package_data(self):
         return {
             'package_id': self.id,
-            'company_id': self.company_id,
+            'company': self.company,
             'package_name': self.package_name,
             'package_num_total_uses_at_start': self.package_num_total_uses_at_start,
             'package_num_used_when_keyed': self.package_num_used_when_keyed,

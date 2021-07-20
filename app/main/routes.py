@@ -6,7 +6,7 @@ from app.models import Company, Customer, Package, PackageUse
 from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
-from app.main.email import send_package_invoice_email
+from app.main.email import send_package_invoice_email # to be enabled once in production
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -68,18 +68,18 @@ def register_new_package():
         new_package = Package(
             admin_id=current_user.get_id(), 
             cust_id=session['cust_id'],
+            company_id=company_id,
             package_name=form.package_name.data,
             package_num_total_uses_at_start=package_num_total_uses_at_start,
             package_num_used_when_keyed=package_num_used_when_keyed,
-            package_price_paid_in_cents=package_price_paid_in_cents,
-            company_id=company_id
+            package_price_paid_in_cents=package_price_paid_in_cents
             )
         db.session.add(new_package)
         db.session.commit()
         del session['cust_id']
         flash(('You have created a package for customer with phone/email: {}'.format(session['phone_or_email'])))
         del session['phone_or_email']
-        send_package_invoice_email(current_user)
+        # send_package_invoice_email(current_user)
         return redirect(url_for('main.admin_home'))
     return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
@@ -165,6 +165,7 @@ def port_customer_and_package():
         new_package  = Package(
             admin_id=current_user.get_id(),
             cust_id=cust_id,
+            company_id=current_user.company_id,
             package_name=form.package_name.data,
             package_num_total_uses_at_start=form.package_num_total_uses_at_start.data,
             package_num_used_when_keyed=form.package_num_used_when_keyed.data,
