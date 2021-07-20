@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField, DecimalField, DateField
 from wtforms.validators import ValidationError, DataRequired, InputRequired
 from app.models import Admin, Customer, Package, PackageUse
-
+from app.helperfunc import check_and_clean_phone_number
 
 package_choices = ['Haircut men', 'Haircut women']
 
@@ -30,8 +30,20 @@ class PortCustomerAndPackageForm(FlaskForm):
     created_at = DateField('Date Package Created (YYYY-MM-DD e.g. 2021-01-30)', format='%Y-%m-%d')
     submit = SubmitField(('Port new package'))
 
+    def validate_phone(self, phone):
+        try:
+            check_and_clean_phone_number(phone.data)
+        except:
+            raise ValidationError(('Phone number is not valid'))
+
 
 class TransferPackageForm(FlaskForm):
     phone = StringField(('Phone Number to transfer to'), validators=[DataRequired()])
     num_uses_to_transfer = IntegerField(('No. package uses to transfer'), validators=[DataRequired()])
     submit = SubmitField(('Transfer to friend'))
+
+    def validate_phone(self, phone):
+        try:
+            check_and_clean_phone_number(phone.data)
+        except:
+            raise ValidationError(('Phone number is not valid'))

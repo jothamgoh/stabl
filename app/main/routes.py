@@ -2,7 +2,7 @@ from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
-from app.models import Customer, Package, PackageUse
+from app.models import Company, Customer, Package, PackageUse
 from app.main.forms import SearchCustomerForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
@@ -33,7 +33,7 @@ def customer_home():
 
 @bp.route('/admin/search-customer', methods=['GET', 'POST'])
 @login_required(role='admin')
-def search_for_customer():
+def search_for_customer(): # this does not filter customer by company. This filters every customer in the database with Stabl
     form = SearchCustomerForm()
     if form.validate_on_submit():
         # try to find customer using phone or email
@@ -61,6 +61,7 @@ def register_new_package():
         package_num_total_uses_at_start = form.package_num_total_uses_at_start.data
         package_num_used_when_keyed = form.package_num_used_when_keyed.data
         package_price_paid_in_cents = int((form.package_price_paid.data) * 100)
+        company_id = current_user.company_id
         if package_num_total_uses_at_start <= package_num_used_when_keyed or package_price_paid_in_cents < 0:
             flash(('The data you entered does not make sense. Please check and try again.'))
             return redirect(url_for('main.register_new_package'))
@@ -70,7 +71,8 @@ def register_new_package():
             package_name=form.package_name.data,
             package_num_total_uses_at_start=package_num_total_uses_at_start,
             package_num_used_when_keyed=package_num_used_when_keyed,
-            package_price_paid_in_cents=package_price_paid_in_cents
+            package_price_paid_in_cents=package_price_paid_in_cents,
+            company_id=company_id
             )
         db.session.add(new_package)
         db.session.commit()
@@ -112,11 +114,7 @@ def transfer_package(package_id):
     num_uses_left = p.num_uses_left()
     form = TransferPackageForm()
     if form.validate_on_submit():
-        try: # validate phone number
-            phone_number = check_and_clean_phone_number(form.phone.data)
-        except:
-            flash(invalid_phone_number_message())
-            return redirect(url_for('main.transfer_package', package_id=package_id))
+        phone_number = check_and_clean_phone_number(form.phone.data)
         if phone_number == current_user.phone:
             flash('You cannot transfer a package to your own phone number.')
             return redirect(url_for('main.transfer_package', package_id=package_id))
@@ -132,6 +130,7 @@ def transfer_package(package_id):
             new_package_for_transferee = Package(
                 admin_id=None,
                 cust_id=cust_id,
+                company_id=p.company_id,
                 package_name=p.package_name,
                 package_num_total_uses_at_start=num_uses_to_transfer,
                 package_price_paid_in_cents=0,
@@ -161,11 +160,7 @@ def display_package_summary(package_id):
 def port_customer_and_package():
     form = PortCustomerAndPackageForm()
     if form.validate_on_submit():
-        try:
-            phone_number = check_and_clean_phone_number(form.phone.data)
-        except:
-            flash (invalid_phone_number_message())
-            return redirect(url_for('main.port_customer_and_package'))
+        phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number, name=form.name.data)
         new_package  = Package(
             admin_id=current_user.get_id(),

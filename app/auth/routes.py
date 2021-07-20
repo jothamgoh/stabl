@@ -150,16 +150,12 @@ def customer_register():
         except:
             flash (invalid_phone_number_message())
             return redirect(url_for('auth.customer_register'))
-        try:
-            user = Customer(name=form.name.data, email=form.email.data, phone=phone_number)
-            user.set_password(form.password.data)
-            db.session.add(user)
-            db.session.commit()
-            flash(('Congratulations, {} is now a registered customer! Please ask them to log in'.format(user.phone)))
-            return redirect(url_for('main.admin_home'))
-        except:
-            flash ('ERROR: Phone number is already in use. Ask customer to Login')
-            return redirect(url_for('auth.customer_register'))
+        user = Customer(name=form.name.data, email=form.email.data, phone=phone_number)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash(('Congratulations, {} is now a registered customer! Please ask them to log in'.format(user.phone)))
+        return redirect(url_for('main.admin_home'))
     return render_template('auth/customer_register.html', title=('Register'),
                            form=form)
 

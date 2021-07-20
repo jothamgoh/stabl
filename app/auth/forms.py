@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import Admin, Customer
-
+from app.helperfunc import check_and_clean_phone_number
 
 class AdminLoginForm(FlaskForm):
     email = StringField(('Email'), validators=[DataRequired(), Email()])
@@ -72,7 +72,11 @@ class CustomerRegistrationForm(FlaskForm):
             raise ValidationError(('Email address is already registered.'))
 
     def validate_phone(self, phone):
-        user = Customer.query.filter_by(phone=phone.data).first()
+        try:
+            phone_number = check_and_clean_phone_number(phone.data)
+        except:
+            raise ValidationError(('Phone number is not valid'))
+        user = Customer.query.filter_by(phone=phone_number).first()
         if user is not None:
             raise ValidationError(('Phone number is already registered.'))
 
@@ -85,3 +89,8 @@ class InputEmailAndPasswordForm(FlaskForm):
         ('Repeat Password'), validators=[DataRequired(),
                                            EqualTo('password')])
     submit = SubmitField(('Confirm information'))
+
+    def validate_email(self, email):
+        user = Customer.query.filter_by(email=email.data).first()
+        if user is not None:
+            raise ValidationError(('Email address is already registered.'))
