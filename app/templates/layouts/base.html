@@ -90,7 +90,18 @@
 
     {% include 'includes/navigation.html' %}
 
-    {% block content %}{% endblock content %}
+    <div class="container">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-secondary" role="alert">{{ message }}</div>
+          {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+
+  {% block content %}{% endblock content %}
+  </div>
 
     {% include 'includes/settings-box.html' %}
 
