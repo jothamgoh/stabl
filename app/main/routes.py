@@ -19,7 +19,7 @@ def index():
 @bp.route('/admin/index', methods=['GET', 'POST'])
 @login_required(role='admin')
 def admin_home():
-    return render_template('admin_home.html', title='Home')
+    return render_template('dashboard.html', title='Home')
 
 
 @bp.route('/home', methods=['GET', 'POST'])
