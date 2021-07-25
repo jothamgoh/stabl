@@ -46,7 +46,7 @@
                                         <span class="input-group-text"><span class="fas fa-list-ol"></span></span>
                                         {{ form.package_num_total_uses_at_start(class="form-control") }}
                                     </div>
-                                    <p class="text-danger">{% for errors in form.phone.errors %}{{ errors }}{% endfor %}</p>
+                                    <p class="text-danger">{% for errors in form.package_num_total_uses_at_start.errors %}{{ errors }}{% endfor %}</p>
                                 </div>
                                 <!-- End of Form -->
                                 <!-- Form -->
@@ -56,7 +56,7 @@
                                         <span class="input-group-text"><span class="fab fa-creative-commons-zero"></span></span>
                                         {{ form.package_num_used_when_keyed(placeholder="Enter 0 if new package created", class="form-control") }}
                                     </div>
-                                    <p class="text-danger">{% for errors in form.phone.errors %}{{ errors }}{% endfor %}</p>
+                                    <p class="text-danger">{% for errors in form.package_num_used_when_keyed.errors %}{{ errors }}{% endfor %}</p>
                                 </div>
                                 <!-- End of Form -->
                                 <!-- Form -->
@@ -66,7 +66,7 @@
                                         <span class="input-group-text"><span class="fas fa-dollar-sign"></span></span>
                                         {{ form.package_price_paid(class="form-control") }}
                                     </div>
-                                    <p class="text-danger">{% for errors in form.phone.errors %}{{ errors }}{% endfor %}</p>
+                                    <p class="text-danger">{% for errors in form.package_price_paid.errors %}{{ errors }}{% endfor %}</p>
                                 </div>
                                 <!-- End of Form -->
  
