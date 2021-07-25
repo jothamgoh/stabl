@@ -38,7 +38,7 @@ def register_new_package():
     company_id = current_user.company_id
     # populate package_choices
     company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages.all()
-    form.package_name.choices = [(p.package_name, p.package_name) for p in company_packages_obj]
+    form.package_name.choices = [(p.package_name) for p in company_packages_obj]
 
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)

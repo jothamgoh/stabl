@@ -22,10 +22,10 @@
                                 {{ form.hidden_tag() }}
                                 <!-- Form -->
                                 <div class="form-group mb-4">
-                                    <label for="email">Phone</label>
+                                    <label for="email">Customer Phone Number</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><span class="fas fa-phone"></span></span>
-                                        {{ form.phone(placeholder="Phone Number", class="form-control") }}
+                                        {{ form.phone(placeholder="Phone", class="form-control") }}
                                     </div>  
                                     <p class="text-danger">{% for errors in form.phone.errors %}{{ errors }}{% endfor %}</p>
                                 </div>
