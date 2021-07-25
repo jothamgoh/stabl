@@ -3,12 +3,22 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField, DecimalField, DateField
 from wtforms.validators import ValidationError, DataRequired, InputRequired
 from app.helperfunc import check_and_clean_phone_number
+from flask_login import current_user
+from app.models import Company
 
-package_choices = ['Haircut men', 'Haircut women']
+
+def get_company_packages():
+    company_id = current_user.company_id
+    package_choices = []
+    company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages.all()
+    [package_choices.append(p.package_name) for p in company_packages_obj]
+    return package_choices
+
+# package_choices = ['Haircut men', 'Haircut women']
 
 class RegisterPackageForm(FlaskForm):
     phone = StringField(('Customer Phone Number'), validators=[DataRequired()])
-    package_name = SelectField(('Package Name'), validators=[DataRequired()], choices=package_choices)
+    package_name = SelectField(('Package Name'), validators=[DataRequired()])
     package_num_total_uses_at_start = IntegerField(('No. times package can be used'), validators=[DataRequired()])
     package_num_used_when_keyed = IntegerField(('No. times package has already been used'), validators=[InputRequired()])
     package_price_paid = DecimalField(('Price Paid for Package (SGD)'), validators=[InputRequired()], places=2)
@@ -24,7 +34,7 @@ class RegisterPackageForm(FlaskForm):
 class PortCustomerAndPackageForm(FlaskForm):
     phone = StringField(('Customer Phone Number'), validators=[DataRequired()])
     name = StringField(('Customer Name'))
-    package_name = SelectField(('Package Name'), validators=[DataRequired()], choices=package_choices)
+    package_name = SelectField(('Package Name'), validators=[DataRequired()])
     package_num_total_uses_at_start = IntegerField(('No. times package can be used'), validators=[DataRequired()])
     package_num_used_when_keyed = IntegerField(('No. times package has already been used'), validators=[InputRequired()])
     package_price_paid = DecimalField(('Price Paid for Package (SGD)'), places=2)

@@ -12,6 +12,7 @@ class Company(db.Model):
     name = db.Column(db.String(64))
     admin = db.relationship('Admin', backref='company', lazy='dynamic')
     package = db.relationship('Package', backref='company', lazy='dynamic')
+    company_packages = db.relationship('CompanyPackages', backref='company', lazy='dynamic')
 
     def __repr__(self):
         return '{}'.format(self.name)
@@ -131,7 +132,6 @@ class Package(db.Model):
         }
 
 
-
 class PackageUse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     package_id = db.Column(db.Integer, db.ForeignKey('package.id'))
@@ -142,7 +142,10 @@ class PackageUse(db.Model):
         return '<Package usage {}>'.format(self.id)
 
 
-
+class CompanyPackages(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
+    package_name = db.Column(db.String(128), nullable=False)
 
 
 @login.user_loader

@@ -35,13 +35,19 @@ def customer_home():
 @login_required(role='admin')
 def register_new_package():
     form = RegisterPackageForm()
+    company_id = current_user.company_id
+    # populate package_choices
+    company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages.all()
+    form.package_name.choices = [(p.package_name, p.package_name) for p in company_packages_obj]
+
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
         package_num_total_uses_at_start = form.package_num_total_uses_at_start.data
         package_num_used_when_keyed = form.package_num_used_when_keyed.data
         package_price_paid_in_cents = int((form.package_price_paid.data) * 100)
-        company_id = current_user.company_id
+        company_id = company_id
+
         if package_num_total_uses_at_start <= package_num_used_when_keyed or package_price_paid_in_cents < 0:
             flash(('The data you entered does not make sense. Please check and try again.'))
             return redirect(url_for('main.register_new_package'))
@@ -59,7 +65,7 @@ def register_new_package():
         flash(('You have created a package for customer with phone number: {}'.format(phone_number)))
         # send_package_invoice_email(current_user)
         return redirect(url_for('main.admin_home'))
-    return render_template('main/register_new_package.html', title='Key in package details', form=form)
+    return render_template('main/register_new_package1.html', title='Key in package details', form=form)
 
 
 @bp.route('/package/use-package/<package_id>', methods=['GET', 'POST'])
