@@ -1,6 +1,7 @@
 from flask.app import Flask
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, SelectField, DecimalField, DateField
+from wtforms import StringField, SubmitField, IntegerField, SelectField, DecimalField
+from wtforms.fields.html5 import DateField
 from wtforms.validators import ValidationError, DataRequired, InputRequired
 from app.helperfunc import check_and_clean_phone_number
 from flask_login import current_user
@@ -38,7 +39,7 @@ class PortCustomerAndPackageForm(FlaskForm):
     package_num_total_uses_at_start = IntegerField(('No. times package can be used'), validators=[DataRequired()])
     package_num_used_when_keyed = IntegerField(('No. times package has already been used'), validators=[InputRequired()])
     package_price_paid = DecimalField(('Price Paid for Package (SGD)'), places=2)
-    created_at = DateField('Date Package Created (YYYY-MM-DD e.g. 2021-01-30)', format='%Y-%m-%d')
+    created_at = DateField(format='%Y-%m-%d')
     submit = SubmitField(('Port new package'))
 
     def validate_phone(self, phone):

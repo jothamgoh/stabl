@@ -143,6 +143,10 @@ def display_package_summary(package_id):
 @login_required(role='admin')
 def port_customer_and_package():
     form = PortCustomerAndPackageForm()
+    # populate package_choices
+    company_id = current_user.company_id
+    company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages.all()
+    form.package_name.choices = [(p.package_name) for p in company_packages_obj]
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number, name=form.name.data)
