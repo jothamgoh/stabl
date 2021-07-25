@@ -59,7 +59,7 @@ class CustomerOTPForm(FlaskForm):
 class CustomerRegistrationForm(FlaskForm):
     name = StringField(('Name'), validators=[DataRequired()])
     phone = StringField(('Phone Number'), validators=[DataRequired()])
-    email = StringField(('Email'), validators=[DataRequired()])
+    email = StringField(('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(('Password'), validators=[DataRequired()])
     password2 = PasswordField(
         ('Repeat Password'), validators=[DataRequired(),
@@ -75,7 +75,7 @@ class CustomerRegistrationForm(FlaskForm):
         try:
             phone_number = check_and_clean_phone_number(phone.data)
         except:
-            raise ValidationError(('Phone number is not valid'))
+            raise ValidationError(('Phone number is not valid.'))
         user = Customer.query.filter_by(phone=phone_number).first()
         if user is not None:
             raise ValidationError(('Phone number is already registered.'))
