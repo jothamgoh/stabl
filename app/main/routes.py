@@ -65,7 +65,7 @@ def register_new_package():
         flash(('You have created a package for customer with phone number: {}'.format(phone_number)))
         # send_package_invoice_email(current_user)
         return redirect(url_for('main.admin_home'))
-    return render_template('main/register_new_package1.html', title='Key in package details', form=form)
+    return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
 
 @bp.route('/package/use-package/<package_id>', methods=['GET', 'POST'])
