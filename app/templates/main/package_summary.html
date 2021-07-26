@@ -1,36 +1,94 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "layouts/base-customer.html" %}
 
-{% block app_content %}
-<h1>Hi {{ current_user.name }}</h1>
+{% block title %} Package Summary {% endblock %} 
 
-<h2>Package Usage Summary</h2>
-<br>
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
 
-<div class="package">
-<h4><b>{{ package_data.package_name }}: {{ package_data.num_uses_left }} uses left</b></h4>
-<p>Total sessions bought: {{ package_data.package_num_total_uses_at_start }}</p>
-<p>Date package bought: {{ package_data.created_at }}</p> 
-<p>Price paid: {{ package_data.currency }} {{ package_data.package_price_paid_in_cents / 100}}</p>
-<p>Package status: {% if package_data.is_active == 1  %} Active {% else %} Inactive {% endif %}</p>
-<br>
-</div>
+{% block content %}
+    <div class="col-12 col-sm-12 col-xl-12 mb-4">
+        <div class="card border-light shadow-sm">
+            <div class="card-body">
+                <div class="col-12 col-xl-12 px-xl-0 mb-5">
 
-<p><b>Package usage:</b></p]>
-{% for package_use in package_use_data %}
-<div class="Package Usage">
-<p>Datetime used: {{ package_use.created_at }} </p>
-{% endfor %}
-<br>
-<br>
-<br>
-{% if current_user.role=='customer' %}
-<a href="{{ url_for('main.customer_home') }}"><button>Return to home</button></a>
-{% else %}
-<a href="{{ url_for('main.port_customer_and_package') }}"><button>Port another package over</button></a>
-{% endif %}
-</div>
+                    <div class="progress-wrapper">
+                        <div class="progress-info">
+                            <div class="progress-label">
+                                    {% if package_data.is_active==1 %}
+                                    <span class="text-success"><b>Package Status:</b> {{ package_data.num_uses_left }} / {{ package_data.package_num_total_uses_at_start }}</span>
+                                    {% else %}
+                                    <span class="text-danger"><b>Package Status:</b> Inactive</span>
+                                    {% endif %}    
+                            </div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ package_data.num_uses_left / package_data.package_num_total_uses_at_start * 100 }}%" aria-valuenow="{{ package_data.num_uses_left }}" aria-valuemin="0" aria-valuemax="{{ package_data.package_num_total_uses_at_start }}"></div>
+                        </div>
+                    </div>
+
+                    <h1 class="h3 mb-3"><b>{{ package_data.package_name }}:</b> {{ package_data.num_uses_left }} uses left</h1>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-secondary me-1"><span class="fas fa-desktop"></span></span> <b>Total sessions bought:</b> {{ package_data.package_num_total_uses_at_start }} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-primary me-1"><span class="fas fa-mobile-alt"></span></span> <b>package_num_used_when_keyed:</b> {{ package_data.package_num_used_when_keyed }}</h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>package_num_times_used_after_keyed:</b> {{ package_data.package_num_times_used_after_keyed }} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>package_num_times_transferred:</b> {{ package_data.package_num_times_transferred }} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Date package bought:</b> {{ package_data.created_at }} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Company:</b> {{ package_data.company }} </h6>
+                </div>
+
+                <!-- Package Use -->
+                <div class="card-header">
+                    <h2 class="fs-5 fw-bold mb-0">Package Use</h2>
+                </div>
+                {% for package_use in package_use_data %}
+                <div class="card-body">
+                        <!-- Packaged usage -->
+                            <div class="row ps-lg-1">
+                                <div class="col-auto">
+                                    <div class="icon-shape icon-xs icon-shape-success rounded">
+                                        <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+                                    </div>
+                                </div>
+                                <div class="col ms-n2">
+                                    <h3 class="fs-6 fw-bold mb-1">You used a package</h3>
+                                    <p class="mb-1">Date used: {{ package_use.created_at }}</p>
+                                    <p class="small">X minute ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- If package transferred -->
+                        <!-- <div class="list-group-item border-0">
+                            <div class="row ps-lg-1">
+                                <div class="col-auto">
+                                    <div class="icon-shape icon-xs icon-shape-success rounded">
+                                        <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path></svg>
+                                    </div>
+                                </div>
+                                <div class="col ms-n2 mb-3">
+                                    <h3 class="fs-6 fw-bold mb-1">Package transfer</h3>
+                                    <p class="mb-0">Date package transferred: </p>
+                                    <span class="small">1 minute ago</span>
+                                </div>
+                            </div>
+                        </div> -->
+                
+                {% endfor %}
+
+                {% if current_user.role=='customer' %}
+                <a class="btn btn-sm btn-primary" href="{{ url_for('main.customer_home') }}"><span class="fas fa-home"></span> Return Home </a>
+                {% else %}
+                <a class="btn btn-sm btn-primary" href="{{ url_for('main.port_customer_and_package') }}"><span class="fas fa-exchange-alt"></span> Port Another Package </a>
+                {% endif %}
+                </div>
+                </div>
+                </div>
 
 
 
-{% endblock %}
+                
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
