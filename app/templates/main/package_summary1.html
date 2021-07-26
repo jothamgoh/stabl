@@ -35,6 +35,31 @@
                     <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Date package bought:</b> {{ package.created_at }} </h6>
                     <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Company:</b> {{ package.company }} </h6>
                 </div>
+
+                          <!-- Button Modal -->
+                          <button type="button" class="btn btn-block btn-dark mb-3" data-bs-toggle="modal" data-bs-target="#modal-notification">Notification</button>
+                          <!-- Modal Content -->
+                          <div class="modal fade" id="modal-notification" tabindex="-1" role="dialog" aria-labelledby="modal-notification" aria-hidden="true">
+                              <div class="modal-dialog modal-info modal-dialog-centered" role="document">
+                                  <div class="modal-content bg-gradient-secondary">
+                                      <div class="modal-header">
+                                          <p class="modal-title" id="modal-title-notification">A new experience, personalized for you.</p>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                      </div>
+                                      <div class="modal-body">
+                                          <div class="py-3 text-center">
+                                              <span class="modal-icon display-1-lg"><span class="far fa-envelope-open"></span></span>
+                                              <h2 class="h4 modal-title my-3">Important message!</h2>
+                                              <p>Do you know that you can assign status and relation to a company right in the visit list?.</p>
+                                          </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button type="button" class="btn btn-sm btn-white">Go to Inbox</button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <!-- End of Modal Content -->
                 <a class="btn btn-sm btn-secondary" href="{{ url_for('main.use_package', package_id=package.package_id) }}"><span class="fas fa-plus-circle mr-1"></span> Use Package </a>
                 <a class="btn btn-sm btn-tertiary" href="{{ url_for('main.transfer_package', package_id=package.package_id) }}"><span class="fas fa-user-plus mr-1"></span> Transfer Package </a>
                 <a class="btn btn-sm btn-primary" href="{{ url_for('main.display_package_invoice', package_id=package.package_id) }}"><span class="fas fa-file-invoice mr-1"></span> Invoice </a>

@@ -35,8 +35,37 @@
                     <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Date package bought:</b> {{ package.created_at }} </h6>
                     <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Company:</b> {{ package.company }} </h6>
                 </div>
-                <a class="btn btn-sm btn-secondary" href="{{ url_for('main.use_package', package_id=package.package_id) }}"><span class="fas fa-plus-circle mr-1"></span> Use Package </a>
-                <a class="btn btn-sm btn-tertiary" href="{{ url_for('main.transfer_package', package_id=package.package_id) }}"><span class="fas fa-user-plus mr-1"></span> Transfer Package </a>
+
+                {% if package.is_active==1 %}
+                <!-- Button Modal -->
+                <a class="btn btn-sm btn-tertiary" data-bs-toggle="modal" data-bs-target="#modal-package{{ package.package_id }}"><span class="fas fa-plus-circle mr-1"></span> Use Package </a>
+                <!-- Modal Content -->
+                <div class="modal fade" id="modal-package{{ package.package_id }}" tabindex="-1" role="dialog" aria-labelledby="modal-achievement" aria-hidden="true">
+                    <div class="modal-dialog modal-tertiary modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header mx-auto">
+                                <p class="lead mb-0 text-white">Package: {{package.package_name}} </p>
+                            </div>
+                            <div class="modal-body">
+                                <div class="text-center">
+                                    <span class="modal-icon display-1 text-white"><span class="fas fa-medal"></span></span>
+                                    <h2 class="h6 modal-title mb-3 text-white">Please acknowledge the following before using the package:</h2>
+                                    <ul class="text-left text-white my-3">
+                                        <li>I am redeeming a one time use for the package: {{ package.package_name }} </li>
+                                        <li>Staff is present to witness package use</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="modal-footer d-flex justify-content-center pt-0 pb-3">
+                                <a class="btn btn-sm btn-white text-tertiary" href="{{ url_for('main.use_package', package_id=package.package_id) }}"> Use Package </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Modal Content -->
+                <a class="btn btn-sm btn-secondary" href="{{ url_for('main.transfer_package', package_id=package.package_id) }}"><span class="fas fa-user-plus mr-1"></span> Transfer Package </a>
+                {% endif %}
+
                 <a class="btn btn-sm btn-primary" href="{{ url_for('main.display_package_invoice', package_id=package.package_id) }}"><span class="fas fa-file-invoice mr-1"></span> Invoice </a>
             </div>
         </div>
