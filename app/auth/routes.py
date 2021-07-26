@@ -117,11 +117,14 @@ def customer_otp():
             if user.email is None and user.password_hash is None:
                 return redirect(url_for('auth.set_email_and_password')) 
             del session['phone']
-            return redirect(next_page)
+            try:
+                return redirect(next_page)
+            except:
+                return redirect(url_for('main.customer_home')) # if customer keys in wrong OTP first time round, error. This is the fallback
         else:
             flash(('Invalid OTP. Please key in again'))
             return redirect(url_for('auth.customer_otp'))
-    return render_template('auth/customer_otp.html', title=('Key in One Time Password'), form=form)
+    return render_template('auth/customer_otp1.html', title=('Key in One Time Password'), form=form)
 
 
 @bp.route('/set-email-and-password', methods=['GET', 'POST'])
