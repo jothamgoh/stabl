@@ -1,26 +1,112 @@
-{% extends 'base.html' %}
+{% extends "layouts/base-fullscreen.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
-{% block app_content %}
-    <h1>Sign In</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
-        </div>
-    </div>
-    <br>
-    <p>
-        Don't know  your password?
-        <a href="{{ url_for('auth.customer_login_otp') }}">Login using OTP instead</a>
-    </p>
-    
-    <p>
-        Changed your phone number?
-        <a href="">Change your phone number through email</a>
-    </p>
+{% block title %} Customer Sign In {% endblock %} 
 
-    <p>
-        Forgot Your Password?
-       <a href="{{ url_for('auth.customer_reset_password_request') }}">Click to Reset It</a>
-   </p>
-{% endblock %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <!-- Section -->
+        <section class="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
+            <div class="container">
+                <div class="row justify-content-center form-bg-image" data-background-lg="/static/assets/img/illustrations/signin.svg">
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">
+                                    <a target="_blank"
+                                       href="{{ url_for('main.index') }}">Customer</a> - Login
+                                </h1>
+                                <br />
+                                <p>
+                                    {% if msg %}
+                                        {{ msg | safe }}
+                                    {% else %}
+                                        Add your credentials
+                                    {% endif %}     
+                                </p>                                 
+                            </div>
+
+                            <form method="post" action="" class="mt-4">
+                                
+                                {{ form.hidden_tag() }}
+
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Phone Number or Email</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="basic-addon1"><span class="fas fa-user-circle"></span></span>
+                                        {{ form.phone_or_email(placeholder="Phone Number or Email", class="form-control") }}
+                                    </div>
+                                </div>
+                                <!-- End of Form -->
+                                <div class="form-group">
+                                    <!-- Form -->
+                                    <div class="form-group mb-4">
+                                        <label for="password">Your Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text" id="basic-addon2"><span class="fas fa-unlock-alt"></span></span>
+                                            {{ form.password(placeholder="Password", class="form-control", type="password") }}
+                                        </div>
+                                    </div>
+                                    <!-- End of Form -->
+                                    <div class="d-flex justify-content-between align-items-top mb-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value={{ form.remember_me }}
+                                            <label class="form-check-label mb-0" for="remember">
+                                              Remember me
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" name="register" class="btn btn-dark">Sign in</button>
+                                </div>
+                            </form>
+
+                            <div class="mt-3 mb-4 text-center">
+                                <span class="fw-normal">or</span>
+                            </div>
+                            <div class="d-flex justify-content-center my-4">
+                                <a href="#" class="btn btn-icon-only btn-pill btn-outline-gray-400 text-facebook me-2" type="button" aria-label="facebook button" title="facebook button">
+                                    <span aria-hidden="true" class="fab fa-facebook-f"></span>
+                                </a>
+                                <a href="#" class="btn btn-icon-only btn-pill btn-outline-gray-400 text-twitter me-2" type="button" aria-label="twitter button" title="twitter button">
+                                    <span aria-hidden="true" class="fab fa-twitter"></span>
+                                </a>
+                                <a href="#" class="btn btn-icon-only btn-pill btn-outline-gray-400 text-facebook" type="button" aria-label="github button" title="github button">
+                                    <span aria-hidden="true" class="fab fa-github"></span>
+                                </a>
+                            </div>
+
+
+                            <p>
+                                Don't know  your password?
+                                <u><a class="text-info" href="{{ url_for('auth.customer_login_otp') }}">Login using OTP instead</a></u>
+                            </p>
+                            
+                            <p>
+                                Changed your number?
+                                <a class='text-danger' href="">Use email to update your phone (TO BE BUILT)</a>
+                            </p>
+                        
+                            <p>
+                                Forgot Your Password?
+                               <u><a class="text-info" href="{{ url_for('auth.customer_reset_password_request') }}">Click to Reset It</a></u>
+                           </p>
+                        
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
