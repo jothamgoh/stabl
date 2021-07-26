@@ -124,7 +124,7 @@ def customer_otp():
         else:
             flash(('Invalid OTP. Please key in again'))
             return redirect(url_for('auth.customer_otp'))
-    return render_template('auth/customer_otp1.html', title=('Key in One Time Password'), form=form)
+    return render_template('auth/customer_otp.html', title=('Key in One Time Password'), form=form)
 
 
 @bp.route('/set-email-and-password', methods=['GET', 'POST'])

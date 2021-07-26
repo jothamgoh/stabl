@@ -1,16 +1,69 @@
-{% extends 'base.html' %}
+{% extends "layouts/base-fullscreen.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
-{% block app_content %}
-    <h1>Key in OTP</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
-        </div>
-    </div>
-    <br>
-    <p>
-        Login using
-        <a href="">email and password instead (to be added)</a>
-    </p>
-{% endblock %}
+{% block title %} Key in OTP {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <!-- Section -->
+        <section class="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
+            <div class="container">
+                <div class="row justify-content-center form-bg-image" data-background-lg="/static/assets/img/illustrations/signin.svg">
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">
+                                    <a target="_blank"
+                                       href="{{ url_for('main.index') }}">Customer</a> - Key in OTP
+                                </h1>
+                                <br />
+                                <p>
+                                    {% if msg %}
+                                        {{ msg | safe }}
+                                    {% else %}
+                                        Login using OTP
+                                    {% endif %}     
+                                </p>                                 
+                            </div>
+
+                            <form method="post" action="" class="mt-4">
+                                
+                                {{ form.hidden_tag() }}
+
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">OTP</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="basic-addon1"><span class="fas fa-user-circle"></span></span>
+                                        {{ form.otp(placeholder="OTP", class="form-control") }}
+                                    </div>
+                                </div>
+                                <!-- End of Form -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-dark">Submit OTP</button>
+                                </div>
+                            </form>
+
+                            <div class="mt-3 mb-4 text-center">
+                                <span class="fw-normal">or</span>
+                            </div>
+
+                            <div class="mt-3 mb-4 text-center">
+                                <p><u><a class="text-info" href="{{ url_for('auth.customer_login') }}">Use your password to login instead</a></u></p>                                
+                            </div>                        
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
