@@ -43,12 +43,13 @@
                 <div class="modal fade" id="modal-package{{ package.package_id }}" tabindex="-1" role="dialog" aria-labelledby="modal-achievement" aria-hidden="true">
                     <div class="modal-dialog modal-tertiary modal-dialog-centered" role="document">
                         <div class="modal-content">
-                            <div class="modal-header mx-auto">
-                                <p class="lead mb-0 text-white">Package: {{package.package_name}} </p>
+                            <div class="modal-header text-white">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="text-center">
-                                    <span class="modal-icon display-1 text-white"><span class="fas fa-medal"></span></span>
+                                    <span class="modal-icon display-1 text-primary"><span class="fas fa-medal"></span></span>
+                                    <h2 class="h4 modal-title mb-3 text-white text-center">Use Package: {{package.package_name}}</h2>
                                     <h2 class="h6 modal-title mb-3 text-white">Please acknowledge the following before using the package:</h2>
                                     <ul class="text-left text-white my-3">
                                         <li>I am redeeming a one time use for the package: {{ package.package_name }} </li>
