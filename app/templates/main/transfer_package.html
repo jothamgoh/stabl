@@ -1,17 +1,67 @@
-{% extends 'base.html' %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "layouts/base-fullscreen.html" %}
 
-{% block app_content %}
-    <h1>{{ title }}</h1>
-    <br>
-    <p><b>Package you're transferring:</b> {{ package_data.package_name }}</p>
-    <p><b>Number of uses left:</b> {{ package_data.num_uses_left }}</p>
-    <br>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
-        </div>
-        
-    </div>
-    <br>
-{% endblock %}
+{% block title %} Transfer Package {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <section class="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
+            <div class="container">
+                {% if current_user.role=='customer' %}
+                <p class="text-center"><a href="{{ url_for('main.customer_home') }}" class="text-gray-700"><i class="fas fa-angle-left me-2"></i>Back to homepage</a></p>
+                {% elif current_user.role=='admin' %}
+                <p class="text-center"><a href="{{ url_for('main.admin_home') }}" class="text-gray-700"><i class="fas fa-angle-left me-2"></i>Back to homepage</a></p>
+                {% endif %}
+                <div class="row justify-content-center form-bg-image">
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="mb-4 mb-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">Transfer Package To A Friend</h1>
+                                
+                            </div>
+                            <p><b>Package:</b> {{ package_data.package_name }}</p>
+                            <p><b>Number of uses left:</b> {{ package_data.num_uses_left }}</p>
+                        
+
+                            <form method="post" action="" class="mt-4">
+                                {{ form.hidden_tag() }}
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Phone Number to transfer to</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-phone"></span></span>
+                                        {{ form.phone(placeholder="Phone", class="form-control") }}
+                                    </div>  
+                                    <p class="text-danger">{% for errors in form.phone.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">No. package uses to transfer</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-list-ol"></span></span>
+                                        {{ form.num_uses_to_transfer(class="form-control") }}
+                                    </div>
+                                    <p class="text-danger">{% for errors in form.num_uses_to_transfer.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+ 
+                                <div class="d-grid">
+                                    <button type="submit" name="submit" class="btn btn-dark">Transfer to friend</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
