@@ -1,24 +1,55 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "layouts/base.html" %}
 
-{% block app_content %}
-<h1>Hi {{ current_user.name }}</h1>
+{% block title %} Dashboard {% endblock %} 
 
-{% for package in package_data %}
-<div class="package">
-<h4><b>{{ package.package_name }}: {{ package.num_uses_left }} uses left</b></h4>
-<p>Total sessions bought: {{ package.package_num_total_uses_at_start }}</p>
-<p>package_num_used_when_keyed: {{ package.package_num_used_when_keyed }}</p>
-<p>package_num_times_used_after_keyed: {{ package.package_num_times_used_after_keyed }}</p>
-<p>package_num_times_transferred: {{ package.package_num_times_transferred }}</p>
-<p>Date package bought: {{ package.created_at }}</p>
-<p>Package status: {% if package.is_active == 1  %} Active {% else %} Inactive {% endif %}</p>
-<p>Company: {{ package.company }}</p>
-<a href="{{ url_for('main.use_package', package_id=package.package_id) }}"><button>Use Package</button></a>
-<a href="{{ url_for('main.transfer_package', package_id=package.package_id) }}"><button>Transfer Package</button></a>
-<a href="{{ url_for('main.display_package_invoice', package_id=package.package_id) }}"><button>Invoice</button></a>
-<br>
-<br>
-</div>
-{% endfor %}
-{% endblock %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <div class="btn-toolbar dropdown">
+            <button class="btn btn-dark btn-sm me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="fas fa-plus me-2"></span>New Task
+            </button>
+            <div class="dropdown-menu dashboard-dropdown dropdown-menu-start mt-2 py-0">
+                <a class="dropdown-item fw-normal rounded-top" href="{{ url_for('main.register_new_package') }}"><span class="fa fa-tasks"></span>Register Package</a>
+                <a class="dropdown-item fw-normal" href="{{ url_for('auth.customer_register') }}"><span class="fas fa-cloud-upload-alt"></span>Register New Customer</a>
+                <a class="dropdown-item fw-normal" href="{{ url_for('auth.admin_register') }}"><span class="fas fa-user-shield"></span>Register Admin</a>
+                <a class="dropdown-item fw-normal" href="#"><span class="fas fa-user-shield"></span>Find Customer (Placeholder)</a>
+                <div role="separator" class="dropdown-divider my-0"></div>
+                <a class="dropdown-item fw-normal rounded-bottom" href="{{ url_for('main.port_customer_and_package') }}"><span class="fas fa-rocket text-danger"></span>Port Exisiting Package</a>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-outline-primary">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-primary">Export</button>
+        </div>
+    </div>
+
+    {% for package in package_data %}
+    <div class="col-12 col-sm-12 col-xl-12 mb-4">
+        <div class="card border-light shadow-sm">
+            <div class="card-body">
+                <div class="col-12 col-xl-7 px-xl-0 mb-5">
+                    <h1 class="h5 mb-3"><b>{{ package.package_name }}:</b> {{ package.num_uses_left }} uses left</h1>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-secondary me-1"><span class="fas fa-desktop"></span></span> <b>Total sessions bought:</b> {{ package.package_num_total_uses_at_start }} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-primary me-1"><span class="fas fa-mobile-alt"></span></span> <b>package_num_used_when_keyed:</b> {{ package.package_num_used_when_keyed }}</h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>package_num_times_used_after_keyed:</b> {{ package.package_num_times_used_after_keyed }} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>package_num_times_transferred:</b> {{ package.package_num_times_transferred }} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Date package bought:</b> {{ package.created_at }} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Package status:</b> {% if package.is_active == 1  %} Active {% else %} Inactive {% endif %} </h6>
+                    <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Company:</b> {{ package.company }} </h6>
+                </div>
+                <a class="btn btn-sm btn-secondary" href="{{ url_for('main.use_package', package_id=package.package_id) }}"><span class="fas fa-plus-circle mr-1"></span> Use Package </a>
+                <a class="btn btn-sm btn-tertiary" href="{{ url_for('main.transfer_package', package_id=package.package_id) }}"><span class="fas fa-user-plus mr-1"></span> Transfer Package </a>
+                <a class="btn btn-sm btn-primary" href="{{ url_for('main.display_package_invoice', package_id=package.package_id) }}"><span class="fas fa-file-invoice mr-1"></span> Invoice </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
