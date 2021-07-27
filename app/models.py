@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     role = db.Column(db.String(15))
+    package_use = db.relationship('PackageUse', backref='user', lazy='dynamic')
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
@@ -134,19 +135,29 @@ class Package(db.Model):
 
 class PackageUse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    who_used_package = db.Column(db.Integer, db.ForeignKey('user.id')) # if is_package_transfer = 0, 'user_id' is the person who clicked "use package". if is_package_transfer=1, then 'user_id' is the person you transfer to package to, or package is trasferred from
     package_id = db.Column(db.Integer, db.ForeignKey('package.id'))
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-
+    num_uses = db.Column(db.Integer) # number of uses for the package. A normal use is 1, a transfer can be 1 or more. If num_uses is negative, package transferred from someone else, in which case user_id is the transferee
+    is_package_transfer = db.Column(db.Boolean, default=0) # package was transferred from another customer, or transferred back to the original owner
 
     def __repr__(self):
         return '<Package usage {}>'.format(self.id)
 
+    def list_package_use_data(self):
+        return {
+            'who_used_package': self.who_used_package,
+            'package_id': self.package_id,
+            'created_at': self.created_at,
+            'num_uses': self.num_uses,
+            'is_package_transfer': self.is_package_transfer
+        }
 
-class CompanyPackages(db.Model):
+
+class CompanyPackages(db.Model): # Get company packages list for form input
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
     package_name = db.Column(db.String(128), nullable=False)
-
 
 @login.user_loader
 def load_user(id):

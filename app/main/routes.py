@@ -2,7 +2,7 @@ from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
-from app.models import Company, Customer, Package, PackageUse
+from app.models import Company, Customer, Package, PackageUse, User, Admin
 from app.main.forms import RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
@@ -71,7 +71,12 @@ def register_new_package():
 @bp.route('/package/use-package/<package_id>', methods=['GET', 'POST'])
 @login_required(role='customer')
 def use_package(package_id):
-    p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
+    package_user_id = current_user.id
+    package_user_role = User.query.filter_by(id=package_user_id).first().role
+
+    p = Package.query.filter_by(id=package_id).first_or_404()
+    cust_id_package_belongs_to = p.cust_id
+
     num_uses_left = p.num_uses_left()
     if num_uses_left <= 0:
         p.is_active = 0
@@ -82,7 +87,16 @@ def use_package(package_id):
         if num_uses_left == 1:
             p.is_active = 0
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
+
+
+        # insert package use data
         package_use = PackageUse(package_id=package_id)
+        package_use.num_uses = 1 # number times package used is 1 time
+        if package_user_role == 'admin': # if admin use package, take down the name of the admin
+            admin_name = Admin.query.filter_by(id=package_user_id).first().name
+            package_use.who_used_package = 'Staff ({})'.format(admin_name)
+        else: # else, it's the self who use package
+            package_use.who_used_package = 'self'
         db.session.add(package_use)
         db.session.commit()
         flash('Congrats! You have used this package')
@@ -93,7 +107,8 @@ def use_package(package_id):
 @bp.route('/package/transfer-package/<package_id>', methods=['GET', 'POST'])
 @login_required(role='customer')
 def transfer_package(package_id):
-    p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
+    current_cust_id = current_user.id
+    p = Package.query.filter_by(cust_id=current_cust_id).filter_by(id=package_id).first_or_404() # p is the original package in question
     package_data = p.list_customer_package_data()
     num_uses_left = p.num_uses_left()
     form = TransferPackageForm()
@@ -110,10 +125,10 @@ def transfer_package(package_id):
             if num_uses_left==num_uses_to_transfer:
                 p.is_active = 0
             p.package_num_times_transferred += num_uses_to_transfer
-            cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
+            new_cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
             new_package_for_transferee = Package(
                 admin_id=None,
-                cust_id=cust_id,
+                cust_id=new_cust_id,
                 company_id=p.company_id,
                 package_name=p.package_name,
                 package_num_total_uses_at_start=num_uses_to_transfer,
@@ -123,6 +138,23 @@ def transfer_package(package_id):
             )
             db.session.add(new_package_for_transferee)
             db.session.commit()
+
+            # PackageUse data
+            # The person transferring the package
+            p_transferor = PackageUse(package_id=package_id)
+            p_transferor.who_used_package = phone_number # phone number of the person i am transferring to
+            p_transferor.num_uses = num_uses_to_transfer
+            p_transferor.is_package_transfer = 1
+            db.session.add(p_transferor)
+
+            # The person reciving the package
+            p_recipient = PackageUse(package_id=new_package_for_transferee.id)
+            p_recipient.who_used_package = current_user.phone # phone of the person I received the package from
+            p_recipient.num_uses = -num_uses_to_transfer
+            p_recipient.is_package_transfer = 1
+            db.session.add(p_recipient)
+            db.session.commit()            
+
             flash('You have transferred {} package/s to phone number: {}'.format(num_uses_to_transfer, phone_number))
             return redirect(url_for('main.customer_home'))
     return render_template('main/transfer_package.html', title='Transfer package to a friend', form=form, package_data=package_data) 
@@ -135,7 +167,8 @@ def display_package_summary(package_id):
     package_data = package.list_customer_package_data()
     
     package_use_list = package.package_usage.order_by(PackageUse.created_at.desc()).all()
-    package_use_data = [{'created_at': package_use.created_at} for package_use in package_use_list]
+    package_use_data = [package_use.list_package_use_data() for package_use in package_use_list]
+
     return render_template('main/package_summary.html', title='Package Summary', package_data=package_data, package_use_data=package_use_data)
 
 

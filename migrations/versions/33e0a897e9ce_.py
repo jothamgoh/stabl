@@ -1,8 +1,8 @@
-"""initial
+"""empty message
 
-Revision ID: 75ef36f24393
+Revision ID: 33e0a897e9ce
 Revises: 
-Create Date: 2021-07-20 15:58:08.785008
+Create Date: 2021-07-28 00:42:46.433137
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '75ef36f24393'
+revision = '33e0a897e9ce'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -42,6 +42,13 @@ def upgrade():
     with op.batch_alter_table('admin', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_admin_email'), ['email'], unique=True)
 
+    op.create_table('company_packages',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.Column('package_name', sa.String(length=128), nullable=False),
+    sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('customer',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=True),
@@ -82,9 +89,13 @@ def upgrade():
 
     op.create_table('package_use',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('who_used_package', sa.Integer(), nullable=True),
     sa.Column('package_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('num_uses', sa.Integer(), nullable=True),
+    sa.Column('is_package_transfer', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['package_id'], ['package.id'], ),
+    sa.ForeignKeyConstraint(['who_used_package'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('package_use', schema=None) as batch_op:
@@ -108,6 +119,7 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_customer_email'))
 
     op.drop_table('customer')
+    op.drop_table('company_packages')
     with op.batch_alter_table('admin', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_admin_email'))
 
