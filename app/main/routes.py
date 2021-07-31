@@ -2,8 +2,8 @@ from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
-from app.models import Company, Customer, Package, PackageUse, User, Admin
-from app.main.forms import RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm
+from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackages, CompanyProducts
+from app.main.forms import RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyPackageForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -39,7 +39,6 @@ def register_new_package():
     # populate package_choices
     company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages.all()
     form.package_name.choices = [(p.package_name) for p in company_packages_obj]
-
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
@@ -75,7 +74,6 @@ def use_package(package_id):
     package_user_role = User.query.filter_by(id=package_user_id).first().role
 
     p = Package.query.filter_by(id=package_id).first_or_404()
-    cust_id_package_belongs_to = p.cust_id
 
     num_uses_left = p.num_uses_left()
     if num_uses_left <= 0:
@@ -209,6 +207,52 @@ def display_package_invoice(package_id):
     p = Package.query.filter_by(cust_id=current_user.id).filter_by(id=package_id).first_or_404()
     package_data = p.list_customer_package_data()
     return render_template('main/package_invoice.html', title='Invoice', package_data=package_data)
+
+
+
+@bp.route('/admin/display_available_packages', methods=['GET', 'POST'])
+@login_required(role='admin')
+def display_available_packages():
+    # data to render page
+    company_id = current_user.company_id
+    company_packages = CompanyPackages.query.filter_by(company_id=company_id).all()
+    company_packages_data = [package.list_package_attributes() for package in company_packages]
+
+    # form data for register package modal
+    form = AddCompanyPackageForm()
+    if form.validate_on_submit():
+        package_price_in_cents = int((form.package_price.data) * 100)
+        new_package = CompanyPackages(
+            company_id=company_id, 
+            package_name=form.package_name.data,
+            package_price_in_cents=package_price_in_cents,
+            )
+        db.session.add(new_package)
+        db.session.commit()
+        flash(('New package "{}" added to company!'.format(form.package_name.data)))
+        # send_package_invoice_email(current_user)
+        return redirect(url_for('main.display_available_packages'))
+
+    return render_template('main/display_company_packages.html', title='Display Packages', company_packages_data=company_packages_data, form=form)
+
+
+# @bp.route('/admin/add-package-company-list', methods=['GET', 'POST'])
+# @login_required(role='admin')
+# def add_package_to_company_package_list():
+#     form = AddCompanyPackageForm()
+#     company_id = current_user.company_id
+#     if form.validate_on_submit():
+#         new_package = CompanyPackages(
+#             company_id=company_id, 
+#             package_name=form.package_name.data,
+#             package_price_in_cents=form.package_price.data * 100,
+#             )
+#         db.session.add(new_package)
+#         db.session.commit()
+#         flash(('New package "{}" added to company!'.format(form.package_name.data)))
+#         # send_package_invoice_email(current_user)
+#         return redirect(url_for('main.display_available_packages'))
+#     return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
 
 

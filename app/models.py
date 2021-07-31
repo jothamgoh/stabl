@@ -13,6 +13,7 @@ class Company(db.Model):
     admin = db.relationship('Admin', backref='company', lazy='dynamic')
     package = db.relationship('Package', backref='company', lazy='dynamic')
     company_packages = db.relationship('CompanyPackages', backref='company', lazy='dynamic')
+    company_products = db.relationship('CompanyProducts', backref='company', lazy='dynamic')
 
     def __repr__(self):
         return '{}'.format(self.name)
@@ -158,6 +159,21 @@ class CompanyPackages(db.Model): # Get company packages list for form input
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
     package_name = db.Column(db.String(128), nullable=False)
+    package_price_in_cents = db.Column(db.Integer, nullable=True) # default price of package
+
+    def list_package_attributes(self):
+        return {
+            "package_name": self.package_name,
+            "package_price_in_cents": self.package_price_in_cents
+        }
+
+
+class CompanyProducts(db.Model): # Get products the company offers
+    id = db.Column(db.Integer, primary_key=True)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this item belong to
+    item_name = db.Column(db.String(128), nullable=False)
+    item_price_in_cents = db.Column(db.Integer, nullable=True) # default price of item
+
 
 @login.user_loader
 def load_user(id):
