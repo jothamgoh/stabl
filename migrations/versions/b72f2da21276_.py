@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 33e0a897e9ce
+Revision ID: b72f2da21276
 Revises: 
-Create Date: 2021-07-28 00:42:46.433137
+Create Date: 2021-07-31 21:43:28.180322
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '33e0a897e9ce'
+revision = 'b72f2da21276'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -46,6 +46,15 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('company_id', sa.Integer(), nullable=True),
     sa.Column('package_name', sa.String(length=128), nullable=False),
+    sa.Column('package_price_in_cents', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('company_products',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.Column('product_name', sa.String(length=128), nullable=False),
+    sa.Column('product_price_in_cents', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -119,6 +128,7 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_customer_email'))
 
     op.drop_table('customer')
+    op.drop_table('company_products')
     op.drop_table('company_packages')
     with op.batch_alter_table('admin', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_admin_email'))

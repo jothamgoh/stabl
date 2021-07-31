@@ -171,8 +171,14 @@ class CompanyPackages(db.Model): # Get company packages list for form input
 class CompanyProducts(db.Model): # Get products the company offers
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this item belong to
-    item_name = db.Column(db.String(128), nullable=False)
-    item_price_in_cents = db.Column(db.Integer, nullable=True) # default price of item
+    product_name = db.Column(db.String(128), nullable=False)
+    product_price_in_cents = db.Column(db.Integer, nullable=True) # default price of item
+
+    def list_product_attributes(self):
+        return {
+            "product_name": self.product_name,
+            "product_price_in_cents": self.product_price_in_cents
+        }
 
 
 @login.user_loader

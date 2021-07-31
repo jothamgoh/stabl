@@ -3,7 +3,7 @@ from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
 from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackages, CompanyProducts
-from app.main.forms import RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyPackageForm
+from app.main.forms import RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyPackageForm, AddCompanyProductForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -229,11 +229,33 @@ def display_available_packages():
             )
         db.session.add(new_package)
         db.session.commit()
-        flash(('New package "{}" added to company!'.format(form.package_name.data)))
-        # send_package_invoice_email(current_user)
+        flash(('New package "{}" added and can now be used.'.format(form.package_name.data)))
         return redirect(url_for('main.display_available_packages'))
-
     return render_template('main/display_company_packages.html', title='Display Packages', company_packages_data=company_packages_data, form=form)
+
+
+@bp.route('/admin/display_available_products', methods=['GET', 'POST'])
+@login_required(role='admin')
+def display_available_products():
+    # data to render page
+    company_id = current_user.company_id
+    company_products = CompanyProducts.query.filter_by(company_id=company_id).all()
+    company_products_data = [product.list_product_attributes() for product in company_products]
+
+    # form data for register package modal
+    form = AddCompanyProductForm()
+    if form.validate_on_submit():
+        product_price_in_cents = int((form.product_price.data) * 100)
+        new_product = CompanyProducts(
+            company_id=company_id, 
+            product_name=form.product_name.data,
+            product_price_in_cents=product_price_in_cents,
+            )
+        db.session.add(new_product)
+        db.session.commit()
+        flash(('New product "{}" added and can now be used.'.format(form.product_name.data)))
+        return redirect(url_for('main.display_available_products'))
+    return render_template('main/display_company_products.html', title='Display Products', company_products_data=company_products_data, form=form)
 
 
 # @bp.route('/admin/add-package-company-list', methods=['GET', 'POST'])

@@ -67,9 +67,9 @@ class AddCompanyPackageForm(FlaskForm):
     submit = SubmitField(('Register new package'))
 
 
-class AddCompanyItemForm(FlaskForm):
-    item_name = StringField(('Item Name'), validators=[DataRequired()])
-    item_price = DecimalField(('Item Price (SGD)'), validators=[InputRequired()], places=2) 
+class AddCompanyProductForm(FlaskForm):
+    product_name = StringField(('Item Name'), validators=[DataRequired()])
+    product_price = DecimalField(('Item Price (SGD)'), validators=[InputRequired()], places=2) 
     submit = SubmitField(('Register new item'))
 
 

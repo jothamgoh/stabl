@@ -1,6 +1,6 @@
 {% extends "layouts/base-admin.html" %}
 
-{% block title %} Package Summary {% endblock %} 
+{% block title %} Products Summary {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -11,25 +11,23 @@
             <div class="card-body">
                 <!-- Package Use -->
                 <div class="card-header">
-                    <h2 class="fs-5 fw-bold mb-0">Company Package List</h2>
+                    <h2 class="fs-5 fw-bold mb-0">Company Product List</h2>
                 </div>
-                {% for package in company_packages_data %}
+                {% for product in company_products_data %}
                 <div class="card-body">
                     <!-- Packaged transferred -->
                     <div class="row ps-lg-1">
                         <div class="col ms-n2">
-                            <h3 class="fs-6 fw-bold mb-1">{{ package.package_name }}</h3>
-                            <p class="mb-1">Price: {{ package.package_price_in_cents / 100 }}</p>
+                            <h3 class="fs-6 fw-bold mb-1">{{ product.product_name }}</h3>
+                            <p class="mb-1">Price: {{ product.product_price_in_cents / 100 }}</p>
                         </div>
                     </div>
                 </div>
                 
                 {% endfor %}
 
-                <!-- <a class="btn btn-sm btn-primary" href="#"><span class="fas fa-exchange-alt"></span> Add new </a> -->
-
                 <!-- Button Modal -->
-                <button type="button" class="btn btn-block btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalNewPackage">Add new package</button>
+                <button type="button" class="btn btn-block btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalNewPackage">Add new product</button>
                 <!-- Modal Content -->
                 <div class="modal fade" id="modalNewPackage" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -38,34 +36,34 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body px-md-5">
-                                <h2 class="h4 text-center">Add Package to List</h2>
-                                <p class="text-center mb-4">Enter package name and package price</p>
+                                <h2 class="h4 text-center">Add Product to List</h2>
+                                <p class="text-center mb-4">Enter product name and product price</p>
                                 
                                 <form method="post" action="">
                                     {{ form.hidden_tag() }}
                                     <!-- Form -->
                                     <div class="form-group mb-4">
-                                        <label for="Package Name">Package Name</label>
+                                        <label for="Package Name">Product Name</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><span class="fas fa-clipboard-list"></span></span>
-                                            {{ form.package_name(class="form-select") }}
+                                            {{ form.product_name(class="form-select") }}
                                         </div>
-                                        <p class="text-danger">{% for errors in form.package_name.errors %}{{ errors }}{% endfor %}</p>
+                                        <p class="text-danger">{% for errors in form.product_name.errors %}{{ errors }}{% endfor %}</p>
                                     </div>
                                     <!-- End of Form -->
                                     <div class="form-group">
                                         <!-- Form -->
                                         <div class="form-group mb-4">
-                                            <label for="password">Package Price (SGD)</label>
+                                            <label for="password">Product Price (SGD)</label>
                                             <div class="input-group">
                                                 <span class="input-group-text"><span class="fas fa-dollar-sign"></span></span>
-                                                {{ form.package_price(class="form-control") }}
+                                                {{ form.product_price(class="form-control") }}
                                             </div>  
                                         </div>
                                         <!-- End of Form -->
                                     </div>
                                     <div class="d-grid">
-                                        <button type="submit" name="submit" id="form-submit" class="btn btn-dark">Register New Package Type</button>
+                                        <button type="submit" name="submit" id="form-submit" class="btn btn-dark">Register New Product</button>
                                     </div>
                                 </form>
                             </div>
