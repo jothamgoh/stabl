@@ -12,8 +12,7 @@ class Company(db.Model):
     name = db.Column(db.String(64))
     admin = db.relationship('Admin', backref='company', lazy='dynamic')
     package = db.relationship('Package', backref='company', lazy='dynamic')
-    company_packages = db.relationship('CompanyPackages', backref='company', lazy='dynamic')
-    company_products = db.relationship('CompanyProducts', backref='company', lazy='dynamic')
+    company_packages_and_products = db.relationship('CompanyPackagesAndProducts', backref='company', lazy='dynamic')
 
     def __repr__(self):
         return '{}'.format(self.name)
@@ -139,7 +138,7 @@ class PackageUse(db.Model):
     who_used_package = db.Column(db.Integer, db.ForeignKey('user.id')) # if is_package_transfer = 0, 'user_id' is the person who clicked "use package". if is_package_transfer=1, then 'user_id' is the person you transfer to package to, or package is trasferred from
     package_id = db.Column(db.Integer, db.ForeignKey('package.id'))
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    num_uses = db.Column(db.Integer) # number of uses for the package. A normal use is 1, a transfer can be 1 or more. If num_uses is negative, package transferred from someone else, in which case user_id is the transferee
+    num_uses = db.Column(db.Integer) # number of uses for the package. A normal use is 1, a transfer can be 1 or more. If num_uses is negative, package transferred from someone else, in which case 'who_used_package' is the transferee
     is_package_transfer = db.Column(db.Boolean, default=0) # package was transferred from another customer, or transferred back to the original owner
 
     def __repr__(self):
@@ -155,31 +154,18 @@ class PackageUse(db.Model):
         }
 
 
-class CompanyPackages(db.Model): # Get company packages list for form input
+class CompanyPackagesAndProducts(db.Model): # Get company packages list for form input
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
-    package_name = db.Column(db.String(128), nullable=False)
-    package_price_in_cents = db.Column(db.Integer, nullable=True) # default price of package
+    item_name = db.Column(db.String(128), nullable=False)
+    item_price_in_cents = db.Column(db.Integer, nullable=True) # default price of package
+    item_type = db.Column(db.String(128), nullable=False) # either "package" or "product"
 
-    def list_package_attributes(self):
+    def list_item_attributes(self):
         return {
-            "package_name": self.package_name,
-            "package_price_in_cents": self.package_price_in_cents
+            "item_name": self.item_name,
+            "item_price_in_cents": self.item_price_in_cents
         }
-
-
-class CompanyProducts(db.Model): # Get products the company offers
-    id = db.Column(db.Integer, primary_key=True)
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this item belong to
-    product_name = db.Column(db.String(128), nullable=False)
-    product_price_in_cents = db.Column(db.Integer, nullable=True) # default price of item
-
-    def list_product_attributes(self):
-        return {
-            "product_name": self.product_name,
-            "product_price_in_cents": self.product_price_in_cents
-        }
-
 
 @login.user_loader
 def load_user(id):

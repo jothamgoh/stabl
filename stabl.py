@@ -1,11 +1,11 @@
 from app import create_app, db
-from app.models import User, Customer, Admin, Package, PackageUse, Company, CompanyPackages, CompanyProducts
+from app.models import User, Customer, Admin, Package, PackageUse, Company, CompanyPackagesAndProducts
 
 app = create_app()
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'User': User, 'Customer': Customer, 'Admin': Admin, 'Package': Package, 'PackageUse': PackageUse, 'Company': Company, 'CompanyPackages': CompanyPackages, 'CompanyProducts': CompanyProducts}
+    return {'db': db, 'User': User, 'Customer': Customer, 'Admin': Admin, 'Package': Package, 'PackageUse': PackageUse, 'Company': Company, 'CompanyPackagesAndProducts': CompanyPackagesAndProducts}
 
 
 password = '123'

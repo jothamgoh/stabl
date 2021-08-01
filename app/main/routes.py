@@ -2,7 +2,7 @@ from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
-from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackages, CompanyProducts
+from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts
 from app.main.forms import RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyPackageForm, AddCompanyProductForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
@@ -215,17 +215,18 @@ def display_package_invoice(package_id):
 def display_available_packages():
     # data to render page
     company_id = current_user.company_id
-    company_packages = CompanyPackages.query.filter_by(company_id=company_id).all()
-    company_packages_data = [package.list_package_attributes() for package in company_packages]
+    company_packages = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='package').all()
+    company_packages_data = [package.list_item_attributes() for package in company_packages]
 
     # form data for register package modal
     form = AddCompanyPackageForm()
     if form.validate_on_submit():
         package_price_in_cents = int((form.package_price.data) * 100)
-        new_package = CompanyPackages(
+        new_package = CompanyPackagesAndProducts(
             company_id=company_id, 
-            package_name=form.package_name.data,
-            package_price_in_cents=package_price_in_cents,
+            item_name=form.package_name.data,
+            item_price_in_cents=package_price_in_cents,
+            item_type = 'package'
             )
         db.session.add(new_package)
         db.session.commit()
@@ -239,17 +240,18 @@ def display_available_packages():
 def display_available_products():
     # data to render page
     company_id = current_user.company_id
-    company_products = CompanyProducts.query.filter_by(company_id=company_id).all()
-    company_products_data = [product.list_product_attributes() for product in company_products]
+    company_products = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='product').all()
+    company_products_data = [product.list_item_attributes() for product in company_products]
 
     # form data for register package modal
     form = AddCompanyProductForm()
     if form.validate_on_submit():
         product_price_in_cents = int((form.product_price.data) * 100)
-        new_product = CompanyProducts(
+        new_product = CompanyPackagesAndProducts(
             company_id=company_id, 
-            product_name=form.product_name.data,
-            product_price_in_cents=product_price_in_cents,
+            item_name=form.product_name.data,
+            item_price_in_cents=product_price_in_cents,
+            item_type = 'product'
             )
         db.session.add(new_product)
         db.session.commit()
