@@ -167,6 +167,12 @@ class CompanyPackagesAndProducts(db.Model): # Get company packages list for form
             "item_price_in_cents": self.item_price_in_cents
         }
 
+# class CustomerOrders(db.Model): # table to conslidate all cust orders
+#     order_id = db.Column(db.Integer, primary_key=True)
+#     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
+#     cust_id = db.Column(db.Integer, db.ForeignKey('customer.id')) # which customer used the package
+#     package_
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))

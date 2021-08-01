@@ -61,10 +61,10 @@ class TransferPackageForm(FlaskForm):
             raise ValidationError(('Phone number is not valid'))
 
 
-class AddCompanyPackageForm(FlaskForm):
-    package_name = StringField(('Package Name'), validators=[DataRequired()])
-    package_price = DecimalField(('Package Price (SGD)'), validators=[InputRequired()], places=2) 
-    submit = SubmitField(('Register new package'))
+class AddCompanyPackageForm(FlaskForm): # packages and services are the same thing
+    package_name = StringField(('Service Name'), validators=[DataRequired()])
+    package_price = DecimalField(('Service Price (SGD)'), validators=[InputRequired()], places=2) 
+    submit = SubmitField(('Register new service'))
 
 
 class AddCompanyProductForm(FlaskForm):
