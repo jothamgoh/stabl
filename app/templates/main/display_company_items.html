@@ -30,7 +30,7 @@
                             <p class="mb-1">Price: {{ item.item_price_in_cents / 100 }}</p>
                         </div>
                     </div>
-                    <a class="btn btn-sm btn-secondary" href="{{ url_for('main.edit_existing_item', item_id=item.item_id) }}"><span class="fas fa-minus mr-1"></span> Edit </a>
+                    <a class="btn btn-sm btn-secondary" href="{{ url_for('main.edit_existing_item', item_id=item.item_id) }}"><span class="fas fa-edit mr-1"></span> Edit </a>
                 </div>
                 
                 {% endfor %}
