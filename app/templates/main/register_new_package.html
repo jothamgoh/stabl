@@ -37,7 +37,7 @@
                                         {{ form.package_name(class="form-select") }}
                                     </div>
                                     <p class="text-danger">{% for errors in form.package_name.errors %}{{ errors }}{% endfor %}</p>
-                                    <p class="small"> <u><a class="text-info" href="{{ url_for('main.display_available_services') }}">Add a new package type here</a></u> if you can't find what you want</p>
+                                    <p class="small"> <u><a class="text-info" href="{{ url_for('main.display_items', service_or_product='service') }}">Add a new package type here</a></u> if you can't find what you want</p>
                                 </div>
                                 <!-- End of Form -->
                                 <!-- Form -->

@@ -1,9 +1,10 @@
+from re import search
 from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for, request
 from app.decorators import login_required
 from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders
-from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyPackageForm, AddCompanyProductForm, CreateProductOrderForm
+from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyItemForm, CreateProductOrderForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -210,81 +211,55 @@ def display_package_invoice(package_id):
     return render_template('main/package_invoice.html', title='Invoice', package_data=package_data)
 
 
-
-@bp.route('/admin/display_available_services', methods=['GET', 'POST'])
+# display company services or products
+@bp.route('/admin/display_items/<service_or_product>', methods=['GET', 'POST'])
 @login_required(role='admin')
-def display_available_services():
+def display_items(service_or_product):
     # data to render page
+    service_or_product = service_or_product
     company_id = current_user.company_id
-    company_packages = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='package').all()
-    company_packages_data = [package.list_item_attributes() for package in company_packages]
+    company_items = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type=service_or_product).all()
+    company_item_data = [item.list_item_attributes() for item in company_items]
 
     # form data for register package modal
-    form = AddCompanyPackageForm()
+    form = AddCompanyItemForm()
     if form.validate_on_submit():
-        package_price_in_cents = int((form.package_price.data) * 100)
-        new_package = CompanyPackagesAndProducts(
+        item_price_in_cents = int((form.item_price.data) * 100)
+        new_item = CompanyPackagesAndProducts(
             company_id=company_id, 
-            item_name=form.package_name.data,
-            item_price_in_cents=package_price_in_cents,
-            item_type = 'package'
+            item_name=form.item_name.data,
+            item_price_in_cents=item_price_in_cents,
+            item_type = service_or_product
             )
-        db.session.add(new_package)
+        db.session.add(new_item)
         db.session.commit()
-        flash(('New package "{}" added and can now be used.'.format(form.package_name.data)))
-        return redirect(url_for('main.display_available_services'))
-    return render_template('main/display_company_packages.html', title='Display Packages', company_packages_data=company_packages_data, form=form)
+        flash(('New {} "{}" added and can now be used.'.format(service_or_product, form.item_name.data)))
+        return redirect(url_for('main.display_items', service_or_product=service_or_product))
+    return render_template('main/display_company_items.html', title='Display {}'.format(service_or_product), company_item_data=company_item_data, form=form, service_or_product=service_or_product)
 
 
 @bp.route('/admin/edit_packages/<item_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
-def edit_existing_package(item_id):
-    form = AddCompanyPackageForm()
+def edit_existing_item(item_id):
+    form = AddCompanyItemForm()
     package_obj = CompanyPackagesAndProducts.query.filter_by(company_id=current_user.company_id).filter_by(id=item_id).first()
     package_data_dict = package_obj.list_item_attributes()
     if form.validate_on_submit():
-        package_price_in_cents = int((form.package_price.data) * 100)
-        package_obj.item_name = form.package_name.data 
-        package_obj.item_price_in_cents = package_price_in_cents
+        item_price_in_cents = int((form.item_price.data) * 100)
+        package_obj.item_name = form.item_name.data 
+        package_obj.item_price_in_cents = item_price_in_cents
         db.session.commit()
-        flash(('Successfully edited package: {}'.format(form.package_name.data)))
-        return redirect(url_for('main.display_available_services')) 
+        flash(('Successfully edited item: {}'.format(form.item_name.data)))
+        return redirect(url_for('main.display_items', service_or_product=package_data_dict['item_type'])) 
     elif request.method == 'GET':
-        form.package_name.data = package_data_dict['item_name']
-        form.package_price.data = package_data_dict['item_price_in_cents'] / 100
-    return render_template('main/edit_exisiting_package.html', title='Edit Package', form=form)
-
-
-
-@bp.route('/admin/display_available_products', methods=['GET', 'POST'])
-@login_required(role='admin')
-def display_available_products():
-    # data to render page
-    company_id = current_user.company_id
-    company_products = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='product').all()
-    company_products_data = [product.list_item_attributes() for product in company_products]
-
-    # form data for register package modal
-    form = AddCompanyProductForm()
-    if form.validate_on_submit():
-        product_price_in_cents = int((form.product_price.data) * 100)
-        new_product = CompanyPackagesAndProducts(
-            company_id=company_id, 
-            item_name=form.product_name.data,
-            item_price_in_cents=product_price_in_cents,
-            item_type = 'product'
-            )
-        db.session.add(new_product)
-        db.session.commit()
-        flash(('New product "{}" added and can now be used.'.format(form.product_name.data)))
-        return redirect(url_for('main.display_available_products'))
-    return render_template('main/display_company_products.html', title='Display Products', company_products_data=company_products_data, form=form)
-
+        form.item_name.data = package_data_dict['item_name']
+        form.item_price.data = package_data_dict['item_price_in_cents'] / 100
+    return render_template('main/edit_existing_item.html', title='Edit Item', form=form, package_data_dict=package_data_dict)
 
 
 @bp.route('/admin/create-new-item', methods=['GET', 'POST'])
 @login_required(role='admin')
-def add_item():
+def add_item_to_cart():
     # data to render page
     company_id = current_user.company_id
     form = CreateProductOrderForm()
@@ -317,7 +292,7 @@ def add_item():
 @login_required(role='admin')
 def clear_cart():
     session.pop('checkout', None)
-    return redirect(url_for('main.add_item'))
+    return redirect(url_for('main.add_item_to_cart'))
 
 
 
@@ -365,7 +340,7 @@ def checkout():
 #         db.session.commit()
 #         flash(('New package "{}" added to company!'.format(form.package_name.data)))
 #         # send_package_invoice_email(current_user)
-#         return redirect(url_for('main.display_available_services'))
+#         return redirect(url_for('main.display_items'))
 #     return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
 

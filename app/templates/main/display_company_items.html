@@ -11,20 +11,26 @@
             <div class="card-body">
                 <!-- Package Use -->
                 <div class="card-header">
+                    {% if service_or_product == 'service' %}
                     <h2 class="fs-5 fw-bold mb-0">Company Services List</h2><br>
                     <!-- Button Modal -->
                     <a class="btn btn-sm btn-info" href="#modalNewPackage" data-bs-toggle="modal"><span class="fas fa-box mr-1"></span> Add new service </a>
+                    {% else %}
+                    <h2 class="fs-5 fw-bold mb-0">Company Products List</h2><br>
+                    <!-- Button Modal -->
+                    <a class="btn btn-sm btn-info" href="#modalNewPackage" data-bs-toggle="modal"><span class="fas fa-box mr-1"></span> Add new product </a> 
+                    {% endif %}
                 </div>
-                {% for package in company_packages_data %}
+                {% for item in company_item_data %}
                 <div class="card-body">
                     <!-- Packaged transferred -->
                     <div class="row ps-lg-1">
                         <div class="col ms-n2">
-                            <h3 class="fs-6 fw-bold mb-1">{{ package.item_name }}</h3>
-                            <p class="mb-1">Price: {{ package.item_price_in_cents / 100 }}</p>
+                            <h3 class="fs-6 fw-bold mb-1">{{ item.item_name }}</h3>
+                            <p class="mb-1">Price: {{ item.item_price_in_cents / 100 }}</p>
                         </div>
                     </div>
-                    <a class="btn btn-sm btn-secondary" href="{{ url_for('main.edit_existing_package', item_id=package.item_id) }}"><span class="fas fa-minus mr-1"></span> Edit Package </a>
+                    <a class="btn btn-sm btn-secondary" href="{{ url_for('main.edit_existing_item', item_id=item.item_id) }}"><span class="fas fa-minus mr-1"></span> Edit </a>
                 </div>
                 
                 {% endfor %}
@@ -37,34 +43,50 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body px-md-5">
+                                {% if service_or_product == 'service' %}
                                 <h2 class="h4 text-center">Add Service to List</h2>
                                 <p class="text-center mb-4">Enter service name and price</p>
-                                
+                                {% else %}
+                                <h2 class="h4 text-center">Add Item to List</h2>
+                                <p class="text-center mb-4">Enter item name and price</p>
+                                {% endif %}                                
                                 <form method="post" action="">
                                     {{ form.hidden_tag() }}
                                     <!-- Form -->
                                     <div class="form-group mb-4">
+                                        {% if service_or_product == 'service' %}
                                         <label for="Service Name">Service Name</label>
+                                        {% else %}
+                                        <label for="Service Name">Product Name</label>
+                                        {% endif %}
                                         <div class="input-group">
                                             <span class="input-group-text"><span class="fas fa-clipboard-list"></span></span>
-                                            {{ form.package_name(class="form-select", placeholder="e.g. Men's haircut") }}
+                                            {{ form.item_name(class="form-select", placeholder="e.g. Men's haircut") }}
                                         </div>
-                                        <p class="text-danger">{% for errors in form.package_name.errors %}{{ errors }}{% endfor %}</p>
+                                        <p class="text-danger">{% for errors in form.item_name.errors %}{{ errors }}{% endfor %}</p>
                                     </div>
                                     <!-- End of Form -->
                                     <div class="form-group">
                                         <!-- Form -->
                                         <div class="form-group mb-4">
-                                            <label for="password">Service Price (SGD)</label>
+                                            {% if service_or_product == 'service' %}
+                                            <label for="Price">Service Price (SGD)</label>
+                                            {% else %}
+                                            <label for="Price">Item Price (SGD)</label>
+                                            {% endif %}
                                             <div class="input-group">
                                                 <span class="input-group-text"><span class="fas fa-dollar-sign"></span></span>
-                                                {{ form.package_price(class="form-control") }}
+                                                {{ form.item_price(class="form-control") }}
                                             </div>  
                                         </div>
                                         <!-- End of Form -->
                                     </div>
                                     <div class="d-grid">
+                                        {% if service_or_product == 'service' %}                                        
                                         <button type="submit" name="submit" id="form-submit" class="btn btn-dark">Register New Service</button>
+                                        {% else %}
+                                        <button type="submit" name="submit" id="form-submit" class="btn btn-dark">Register New Item</button>
+                                        {% endif %}
                                     </div>
                                 </form>
                             </div>
