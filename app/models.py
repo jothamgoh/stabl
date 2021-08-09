@@ -175,6 +175,7 @@ class CompanyPackagesAndProducts(db.Model): # Get company packages list for form
 
 class CustomerOrders(db.Model): # table to conslidate all cust orders
     id = db.Column(db.Integer, primary_key=True) # order id
+    order_number = db.Column(db.Integer) # order number for the company
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id')) # which admin created the package
     package_or_product_id = db.Column(db.Integer, db.ForeignKey('company_packages_and_products.id')) # this uses snake case by default!!!

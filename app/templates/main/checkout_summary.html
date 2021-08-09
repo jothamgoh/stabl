@@ -1,0 +1,58 @@
+{% extends "layouts/base-admin.html" %}
+
+{% block title %} Checkout {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    {% set count = namespace(value=0) %}
+
+    <div class="col-12 col-sm-12 col-xl-12 mb-4">
+        <div class="card border-light shadow-sm">
+            <div class="card-body">
+                <!-- Package Use -->
+                <div class="card-header">
+                    <h2 class="fs-3 fw-bold mb-0">Checkout Summary</h2><br> 
+                </div>    
+                {% for item in checkout_data %}
+                <div class="card-body">
+                    <!-- Packaged transferred -->
+                    <div class="row ps-lg-1">
+                        <div class="col ms-n2">
+                            {% set item_subtotal =  (item.price_per_item_in_cents - item.discount_per_item_in_cents) / 100 * item.quantity %}
+                            <b><h3 class="fs-4 fw-bold mb-1">{{ item.item_name }} x {{ item.quantity }}</h3></b>
+                            <p class="mb-1">Price: SGD {{ (item.price_per_item_in_cents / 100)|round(2, 'common') }}</p>
+                            <p class="mb-1">Discount: SGD {{ (item.discount_per_item_in_cents / 100)|round(2, 'common') }}</p>
+                            <p class="fs-5 fw-bold mb-1">Subtotal: {{ item_subtotal|round(2, 'common') }}</p>
+                            {% set count.value = count.value + item_subtotal %}
+                        </div>
+                    </div>
+                </div>                
+                {% endfor %}
+
+                <!-- Calculate Total -->
+                <div class="card-body">
+                <div class="row ps-lg-1">
+                    <div class="col ms-n2">
+                        <h3 class="fs-5 fw-bold mb-1"><b>Total Paid: SGD {{ count.value|round(2, 'common') }}</b></h3>
+                        <a class="btn btn-sm btn-tertiary" href="{{ url_for('main.add_item') }}"><span class="fas fa-cart-plus  mr-1"></span> Add New Order </a>
+                    </div>
+                </div>
+                </div>
+                <!-- End calculate total -->
+
+                </div>
+                </div>
+                </div>
+
+
+                
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}

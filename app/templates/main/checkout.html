@@ -14,7 +14,7 @@
                 <!-- Package Use -->
                 <div class="card-header">
                     <h2 class="fs-3 fw-bold mb-0">Checkout</h2><br> 
-                    <a class="btn btn-sm btn-tertiary" href="#modalNewPackage" data-bs-toggle="modal"><span class="fas fa-cart-plus mr-1"></span> Add Item To Cart </a>
+                    <a class="btn btn-sm btn-info" href="#modalNewPackage" data-bs-toggle="modal"><span class="fas fa-cart-plus mr-1"></span> Add Item To Cart </a>
                     <a class="btn btn-sm btn-secondary" href="{{ url_for('main.clear_cart') }}"><span class="fas fa-minus mr-1"></span> Clear Cart </a>
                 </div>    
                 {% if session['checkout'] %}
@@ -23,27 +23,28 @@
                     <!-- Packaged transferred -->
                     <div class="row ps-lg-1">
                         <div class="col ms-n2">
-                            {% set item_subtotal =  (item.price_per_item_in_cents - item.item_discount) / 100 * item.item_quantity %}
-                            <b><h3 class="fs-4 fw-bold mb-1">{{ item.item_name }}</h3></b>
+                            {% set item_subtotal =  (item.price_per_item_in_cents - item.discount_per_item_in_cents) / 100 * item.quantity %}
+                            <b><h3 class="fs-4 fw-bold mb-1">{{ item.item_name }} x {{ item.quantity }}</h3></b>
                             <p class="mb-1">Price: SGD {{ (item.price_per_item_in_cents / 100)|round(2, 'common') }}</p>
-                            <p class="mb-1">Discount: SGD {{ (item.item_discount / 100)|round(2, 'common') }}</p>
-                            <p class="mb-1">Quantity: {{ item.item_quantity }}</p>
+                            <p class="mb-1">Discount: SGD {{ (item.discount_per_item_in_cents / 100)|round(2, 'common') }}</p>
                             <p class="fs-5 fw-bold mb-1">Subtotal: {{ item_subtotal|round(2, 'common') }}</p>
                             {% set count.value = count.value + item_subtotal %}
                         </div>
                     </div>
                 </div>                
                 {% endfor %}
-                {% endif %}
+                
 
                 <!-- Calculate Total -->
                 <div class="card-body">
                 <div class="row ps-lg-1">
                     <div class="col ms-n2">
                         <h3 class="fs-5 fw-bold mb-1"><b>Cart Total: SGD {{ count.value|round(2, 'common') }}</b></h3>
+                        <a class="btn btn-mb btn-tertiary" href="{{ url_for('main.checkout') }}"><span class="fas fa-credit-card mr-1"></span> Checkout </a>
                     </div>
                 </div>
                 </div>
+                {% endif %}
                 <!-- End calculate total -->
 
                 <!-- Modal Content -->
@@ -112,7 +113,6 @@
                 </div>
                 <!-- End of Modal Content -->
                 </div>
-
                 </div>
                 </div>
 

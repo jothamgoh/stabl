@@ -7,6 +7,7 @@ from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCust
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
+from sqlalchemy.sql.expression import func
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -281,8 +282,8 @@ def add_item():
         d['item_name'] = form.item_name.data
         d['package_or_product_id'] = CompanyPackagesAndProducts.query.filter_by(company_id=current_user.company_id).filter_by(item_name=form.item_name.data).first().id
         d['price_per_item_in_cents'] = price_per_item_in_cents
-        d['item_discount'] = item_discount
-        d['item_quantity'] = form.item_quantity.data
+        d['discount_per_item_in_cents'] = item_discount
+        d['quantity'] = form.item_quantity.data
         if 'checkout' not in session:
             session['checkout'] = [d]
         else: 
@@ -297,6 +298,36 @@ def add_item():
 def clear_cart():
     session.pop('checkout', None)
     return redirect(url_for('main.add_item'))
+
+
+
+@bp.route('/admin/checkout', methods=['GET', 'POST'])
+@login_required(role='admin')
+def checkout():
+    checkout_data = session['checkout']
+    max_id = db.session.query(func.max(CustomerOrders.id)).filter_by(company_id=1).first()[0]
+    if max_id is None:
+        order_number = 1
+    else:
+        order_number = max_id + 1
+    for d in checkout_data:
+        new_item = CustomerOrders(
+            order_number = order_number,
+            company_id=d['company_id'], 
+            admin_id=d['admin_id'],
+            package_or_product_id=d['package_or_product_id'],
+            price_per_item_in_cents=d['price_per_item_in_cents'],
+            discount_per_item_in_cents=d['discount_per_item_in_cents'],
+            quantity=d['quantity'],
+            status='completed'
+            )
+        db.session.add(new_item)
+    db.session.commit()
+    del session['checkout']
+    flash(('Order successful! Please make sure you have collected payment.'))
+    return render_template('main/checkout_summary.html', title="Checkout Summary", checkout_data=checkout_data)
+    
+
 
 
 # @bp.route('/admin/add-package-company-list', methods=['GET', 'POST'])
