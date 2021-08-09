@@ -1,0 +1,128 @@
+{% extends "layouts/base-admin.html" %}
+
+{% block title %} Checkout {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    {% set count = namespace(value=0) %}
+
+    <div class="col-12 col-sm-12 col-xl-12 mb-4">
+        <div class="card border-light shadow-sm">
+            <div class="card-body">
+                <!-- Package Use -->
+                <div class="card-header">
+                    <h2 class="fs-3 fw-bold mb-0">Checkout</h2><br> 
+                    <a class="btn btn-sm btn-tertiary" href="#modalNewPackage" data-bs-toggle="modal"><span class="fas fa-cart-plus mr-1"></span> Add Item To Cart </a>
+                    <a class="btn btn-sm btn-secondary" href="{{ url_for('main.clear_cart') }}"><span class="fas fa-minus mr-1"></span> Clear Cart </a>
+                </div>    
+                {% if session['checkout'] %}
+                {% for item in session['checkout'] %}
+                <div class="card-body">
+                    <!-- Packaged transferred -->
+                    <div class="row ps-lg-1">
+                        <div class="col ms-n2">
+                            {% set item_subtotal =  (item.price_per_item_in_cents - item.item_discount) / 100 * item.item_quantity %}
+                            <b><h3 class="fs-4 fw-bold mb-1">{{ item.item_name }}</h3></b>
+                            <p class="mb-1">Price: SGD {{ (item.price_per_item_in_cents / 100)|round(2, 'common') }}</p>
+                            <p class="mb-1">Discount: SGD {{ (item.item_discount / 100)|round(2, 'common') }}</p>
+                            <p class="mb-1">Quantity: {{ item.item_quantity }}</p>
+                            <p class="fs-5 fw-bold mb-1">Subtotal: {{ item_subtotal|round(2, 'common') }}</p>
+                            {% set count.value = count.value + item_subtotal %}
+                        </div>
+                    </div>
+                </div>                
+                {% endfor %}
+                {% endif %}
+
+                <!-- Calculate Total -->
+                <div class="card-body">
+                <div class="row ps-lg-1">
+                    <div class="col ms-n2">
+                        <h3 class="fs-5 fw-bold mb-1"><b>Cart Total: SGD {{ count.value|round(2, 'common') }}</b></h3>
+                    </div>
+                </div>
+                </div>
+                <!-- End calculate total -->
+
+                <!-- Modal Content -->
+                <div class="modal fade" id="modalNewPackage" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header border-0">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body px-md-5">
+                                <h2 class="h4 text-center">Add Product Or Item</h2>
+                                <p class="text-center mb-4">Choose Item</p>
+                                
+                                <form method="post" action="">
+                                    {{ form.hidden_tag() }}
+                                    <!-- Form -->
+                                    <div class="form-group mb-4">
+                                        <label for="Service Name">Item Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><span class="fas fa-clipboard-list"></span></span>
+                                            {{ form.item_name(class="form-select", placeholder="e.g. Men's haircut") }}
+                                        </div>
+                                        <p class="text-danger">{% for errors in form.item_name.errors %}{{ errors }}{% endfor %}</p>
+                                    </div>
+                                    <!-- End of Form -->
+                                    <div class="form-group">
+                                        <!-- Form -->
+                                        <div class="form-group mb-4">
+                                            <label for="password">Item Price (SGD)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><span class="fas fa-dollar-sign"></span></span>
+                                                {{ form.item_price(class="form-control") }}
+                                            </div>  
+                                        </div>
+                                        <!-- End of Form -->
+                                    </div>
+                                    <div class="form-group">
+                                        <!-- Form -->
+                                        <div class="form-group mb-4">
+                                            <label for="password">Item Discount (SGD)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><span class="fas fa-dollar-sign"></span></span>
+                                                {{ form.item_discount(class="form-control") }}
+                                            </div>  
+                                        </div>
+                                        <!-- End of Form -->
+                                    </div>
+                                    <div class="form-group">
+                                        <!-- Form -->
+                                        <div class="form-group mb-4">
+                                            <label for="password">Item Quantity</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><span class="fas fa-dollar-sign"></span></span>
+                                                {{ form.item_quantity(class="form-control") }}
+                                            </div>  
+                                        </div>
+                                        <!-- End of Form -->
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" name="submit" id="form-submit" class="btn btn-dark">Add Item</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Modal Content -->
+                </div>
+
+                </div>
+                </div>
+
+
+                
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}

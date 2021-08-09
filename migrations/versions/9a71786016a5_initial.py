@@ -1,8 +1,8 @@
-"""empty message
+"""initial
 
-Revision ID: ce346f709601
+Revision ID: 9a71786016a5
 Revises: 
-Create Date: 2021-08-01 16:00:09.788241
+Create Date: 2021-08-04 22:02:51.868211
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ce346f709601'
+revision = '9a71786016a5'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -64,6 +64,21 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_customer_email'), ['email'], unique=True)
         batch_op.create_index(batch_op.f('ix_customer_phone'), ['phone'], unique=True)
 
+    op.create_table('customer_orders',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.Column('admin_id', sa.Integer(), nullable=True),
+    sa.Column('package_or_product_id', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('status', sa.String(length=64), nullable=False),
+    sa.ForeignKeyConstraint(['admin_id'], ['admin.id'], ),
+    sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
+    sa.ForeignKeyConstraint(['package_or_product_id'], ['company_packages_and_products.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('customer_orders', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_customer_orders_created_at'), ['created_at'], unique=False)
+
     op.create_table('package',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('admin_id', sa.Integer(), nullable=True),
@@ -116,6 +131,10 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_package_created_at'))
 
     op.drop_table('package')
+    with op.batch_alter_table('customer_orders', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_customer_orders_created_at'))
+
+    op.drop_table('customer_orders')
     with op.batch_alter_table('customer', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_customer_phone'))
         batch_op.drop_index(batch_op.f('ix_customer_email'))

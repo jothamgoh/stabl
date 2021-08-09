@@ -13,6 +13,7 @@ class Company(db.Model):
     admin = db.relationship('Admin', backref='company', lazy='dynamic')
     package = db.relationship('Package', backref='company', lazy='dynamic')
     company_packages_and_products = db.relationship('CompanyPackagesAndProducts', backref='company', lazy='dynamic')
+    customer_orders = db.relationship('CustomerOrders', backref='customer', lazy='dynamic') # all services and items bought excluding those which are part of a package
 
     def __repr__(self):
         return '{}'.format(self.name)
@@ -40,7 +41,7 @@ class Customer(User):
     email = db.Column(db.String(120), index=True, unique=True)    
     phone = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    package_bought = db.relationship('Package', backref='customer', lazy='dynamic')
+    package_bought = db.relationship('Package', backref='customer', lazy='dynamic') # all package orders only
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -69,6 +70,7 @@ class Admin(User):
     email = db.Column(db.String(120), index=True, unique=True)    
     password_hash = db.Column(db.String(128))
     package_sold = db.relationship('Package', backref='admin', lazy='dynamic')
+    cust_orders = db.relationship('CustomerOrders', backref='admin', lazy='dynamic') # all services and items bought excluding those which are part of a package
 
 
     def set_password(self, password):
@@ -157,21 +159,31 @@ class PackageUse(db.Model):
 class CompanyPackagesAndProducts(db.Model): # Get company packages list for form input
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
+    customer_orders = db.relationship('CustomerOrders', backref='customerorders', lazy='dynamic') # all services and items bought excluding those which are part of a package
     item_name = db.Column(db.String(128), nullable=False)
     item_price_in_cents = db.Column(db.Integer, nullable=True) # default price of package
     item_type = db.Column(db.String(128), nullable=False) # either "package" or "product"
 
     def list_item_attributes(self):
         return {
+            "item_id": self.id,
             "item_name": self.item_name,
-            "item_price_in_cents": self.item_price_in_cents
+            "item_price_in_cents": self.item_price_in_cents,
+            "item_type": self.item_type
         }
 
-# class CustomerOrders(db.Model): # table to conslidate all cust orders
-#     order_id = db.Column(db.Integer, primary_key=True)
-#     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
-#     cust_id = db.Column(db.Integer, db.ForeignKey('customer.id')) # which customer used the package
-#     package_
+
+class CustomerOrders(db.Model): # table to conslidate all cust orders
+    id = db.Column(db.Integer, primary_key=True) # order id
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id')) # which admin created the package
+    package_or_product_id = db.Column(db.Integer, db.ForeignKey('company_packages_and_products.id')) # this uses snake case by default!!!
+    price_per_item_in_cents = db.Column(db.Integer, nullable=True) # price customer paid for package
+    discount_per_item_in_cents = db.Column(db.Integer, nullable=True) # discount for each item
+    quantity = db.Column(db.Integer, nullable=False, default=1) # price customer paid for package
+    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    status = db.Column(db.String(64), nullable=False) # either 'completed', 'cancelled', or 'refunded'
+
 
 @login.user_loader
 def load_user(id):

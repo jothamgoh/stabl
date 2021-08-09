@@ -2,8 +2,8 @@ from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for
 from app.decorators import login_required
-from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts
-from app.main.forms import RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyPackageForm, AddCompanyProductForm
+from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders
+from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyPackageForm, AddCompanyProductForm, CreateProductOrderForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -176,8 +176,8 @@ def port_customer_and_package():
     form = PortCustomerAndPackageForm()
     # populate package_choices
     company_id = current_user.company_id
-    company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages.all()
-    form.package_name.choices = [(p.package_name) for p in company_packages_obj]
+    company_packages_obj = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='package').all()
+    form.package_name.choices = [(p.item_name) for p in company_packages_obj]
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number, name=form.name.data)
@@ -258,6 +258,45 @@ def display_available_products():
         flash(('New product "{}" added and can now be used.'.format(form.product_name.data)))
         return redirect(url_for('main.display_available_products'))
     return render_template('main/display_company_products.html', title='Display Products', company_products_data=company_products_data, form=form)
+
+
+
+@bp.route('/admin/create-new-item', methods=['GET', 'POST'])
+@login_required(role='admin')
+def add_item():
+    # data to render page
+    company_id = current_user.company_id
+    form = CreateProductOrderForm()
+    # populate package_choices
+    company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages_and_products.all()
+    package_names = [(p.item_name) for p in company_packages_obj]
+    form.item_name.choices = package_names
+
+    d = {}
+    if form.validate_on_submit():
+        price_per_item_in_cents = int((form.item_price.data) * 100)
+        item_discount = int((form.item_discount.data) * 100)
+        d['company_id'] = company_id
+        d['admin_id'] = current_user.id
+        d['item_name'] = form.item_name.data
+        d['package_or_product_id'] = CompanyPackagesAndProducts.query.filter_by(company_id=current_user.company_id).filter_by(item_name=form.item_name.data).first().id
+        d['price_per_item_in_cents'] = price_per_item_in_cents
+        d['item_discount'] = item_discount
+        d['item_quantity'] = form.item_quantity.data
+        if 'checkout' not in session:
+            session['checkout'] = [d]
+        else: 
+            cart_list = session['checkout']
+            cart_list.append(d)
+            session['checkout'] = cart_list  # 
+    return render_template('main/checkout.html', title="Checkout", form=form)
+
+
+@bp.route('/admin/clear-cart', methods=['GET', 'POST'])
+@login_required(role='admin')
+def clear_cart():
+    session.pop('checkout', None)
+    return redirect(url_for('main.add_item'))
 
 
 # @bp.route('/admin/add-package-company-list', methods=['GET', 'POST'])

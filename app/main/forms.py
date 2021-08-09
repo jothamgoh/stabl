@@ -73,6 +73,14 @@ class AddCompanyProductForm(FlaskForm):
     submit = SubmitField(('Register new item'))
 
 
+class CreateProductOrderForm(FlaskForm):
+    item_name = SelectField(('Package Name'), validators=[DataRequired()])
+    item_price = DecimalField(('Item Price (SGD)'), validators=[InputRequired()], places=2) 
+    item_discount = DecimalField(('Item Discount (SGD)'), places=2) 
+    item_quantity = IntegerField(('Quantity'), validators=[DataRequired()]) 
+    submit = SubmitField(('Add Product'))
+
+
 # class SearchCustomerForm(FlaskForm):
 #     phone_or_email = StringField(('Phone Number or Email'), validators=[DataRequired()])
 #     submit = SubmitField(('Search for Customer'))
