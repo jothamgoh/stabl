@@ -1,0 +1,57 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %} {{ title }} {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <section class="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
+            <div class="container">
+                <p class="text-center"><a href="{{ url_for('main.display_available_services') }}" class="text-gray-700"><i class="fas fa-angle-left me-2"></i>Back to Packages</a></p>
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="mb-4 mb-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">Edit Package</h1>
+                            </div>
+
+                            <form method="post" action="">
+                                {{ form.hidden_tag() }}
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="Service Name">Service Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-clipboard-list"></span></span>
+                                        {{ form.package_name(class="form-select", placeholder="e.g. Men's haircut") }}
+                                    </div>
+                                    <p class="text-danger">{% for errors in form.package_name.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+                                <div class="form-group">
+                                    <!-- Form -->
+                                    <div class="form-group mb-4">
+                                        <label for="password">Service Price (SGD)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><span class="fas fa-dollar-sign"></span></span>
+                                            {{ form.package_price(class="form-control") }}
+                                        </div>  
+                                    </div>
+                                    <!-- End of Form -->
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" name="submit" id="form-submit" class="btn btn-dark">Edit Package</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+        </section>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

@@ -1,6 +1,6 @@
 from app.main import bp
 from app import db
-from flask import render_template, flash, session, redirect, url_for
+from flask import render_template, flash, session, redirect, url_for, request
 from app.decorators import login_required
 from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders
 from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyPackageForm, AddCompanyProductForm, CreateProductOrderForm
@@ -211,9 +211,9 @@ def display_package_invoice(package_id):
 
 
 
-@bp.route('/admin/display_available_packages', methods=['GET', 'POST'])
+@bp.route('/admin/display_available_services', methods=['GET', 'POST'])
 @login_required(role='admin')
-def display_available_packages():
+def display_available_services():
     # data to render page
     company_id = current_user.company_id
     company_packages = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='package').all()
@@ -232,8 +232,28 @@ def display_available_packages():
         db.session.add(new_package)
         db.session.commit()
         flash(('New package "{}" added and can now be used.'.format(form.package_name.data)))
-        return redirect(url_for('main.display_available_packages'))
+        return redirect(url_for('main.display_available_services'))
     return render_template('main/display_company_packages.html', title='Display Packages', company_packages_data=company_packages_data, form=form)
+
+
+@bp.route('/admin/edit_packages/<item_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def edit_existing_package(item_id):
+    form = AddCompanyPackageForm()
+    package_obj = CompanyPackagesAndProducts.query.filter_by(company_id=current_user.company_id).filter_by(id=item_id).first()
+    package_data_dict = package_obj.list_item_attributes()
+    if form.validate_on_submit():
+        package_price_in_cents = int((form.package_price.data) * 100)
+        package_obj.item_name = form.package_name.data 
+        package_obj.item_price_in_cents = package_price_in_cents
+        db.session.commit()
+        flash(('Successfully edited package: {}'.format(form.package_name.data)))
+        return redirect(url_for('main.display_available_services')) 
+    elif request.method == 'GET':
+        form.package_name.data = package_data_dict['item_name']
+        form.package_price.data = package_data_dict['item_price_in_cents'] / 100
+    return render_template('main/edit_exisiting_package.html', title='Edit Package', form=form)
+
 
 
 @bp.route('/admin/display_available_products', methods=['GET', 'POST'])
@@ -345,7 +365,7 @@ def checkout():
 #         db.session.commit()
 #         flash(('New package "{}" added to company!'.format(form.package_name.data)))
 #         # send_package_invoice_email(current_user)
-#         return redirect(url_for('main.display_available_packages'))
+#         return redirect(url_for('main.display_available_services'))
 #     return render_template('main/register_new_package.html', title='Key in package details', form=form)
 
 

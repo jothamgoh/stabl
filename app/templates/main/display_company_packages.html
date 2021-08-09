@@ -11,7 +11,9 @@
             <div class="card-body">
                 <!-- Package Use -->
                 <div class="card-header">
-                    <h2 class="fs-5 fw-bold mb-0">Company Services List</h2>
+                    <h2 class="fs-5 fw-bold mb-0">Company Services List</h2><br>
+                    <!-- Button Modal -->
+                    <a class="btn btn-sm btn-info" href="#modalNewPackage" data-bs-toggle="modal"><span class="fas fa-box mr-1"></span> Add new service </a>
                 </div>
                 {% for package in company_packages_data %}
                 <div class="card-body">
@@ -22,14 +24,11 @@
                             <p class="mb-1">Price: {{ package.item_price_in_cents / 100 }}</p>
                         </div>
                     </div>
+                    <a class="btn btn-sm btn-secondary" href="{{ url_for('main.edit_existing_package', item_id=package.item_id) }}"><span class="fas fa-minus mr-1"></span> Edit Package </a>
                 </div>
                 
                 {% endfor %}
 
-                <!-- <a class="btn btn-sm btn-primary" href="#"><span class="fas fa-exchange-alt"></span> Add new </a> -->
-
-                <!-- Button Modal -->
-                <button type="button" class="btn btn-block btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalNewPackage">Add new service</button>
                 <!-- Modal Content -->
                 <div class="modal fade" id="modalNewPackage" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
