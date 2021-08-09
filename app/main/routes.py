@@ -325,7 +325,7 @@ def checkout():
     db.session.commit()
     del session['checkout']
     flash(('Order successful! Please make sure you have collected payment.'))
-    return render_template('main/checkout_summary.html', title="Checkout Summary", checkout_data=checkout_data)
+    return render_template('main/checkout_summary.html', title="Checkout Summary", checkout_data=checkout_data, order_number=order_number)
     
 
 

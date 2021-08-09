@@ -13,7 +13,8 @@
             <div class="card-body">
                 <!-- Package Use -->
                 <div class="card-header">
-                    <h2 class="fs-3 fw-bold mb-0">Checkout Summary</h2><br> 
+                    <h2 class="fs-3 fw-bold mb-0">Checkout Summary</h2><br>
+                    <h2 class="fs-5 fw-bold mb-0">Order Number: {{ order_number }}</h2><br> 
                 </div>    
                 {% for item in checkout_data %}
                 <div class="card-body">
@@ -36,7 +37,7 @@
                 <div class="row ps-lg-1">
                     <div class="col ms-n2">
                         <h3 class="fs-5 fw-bold mb-1"><b>Total Paid: SGD {{ count.value|round(2, 'common') }}</b></h3>
-                        <a class="btn btn-sm btn-tertiary" href="{{ url_for('main.add_item') }}"><span class="fas fa-cart-plus  mr-1"></span> Add New Order </a>
+                        <a class="btn btn-mb btn-tertiary" href="{{ url_for('main.add_item') }}"><span class="fas fa-cart-plus  mr-1"></span> Add New Order </a>
                     </div>
                 </div>
                 </div>
