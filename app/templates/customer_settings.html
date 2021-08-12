@@ -1,0 +1,98 @@
+{% extends "layouts/base-customer.html" %}
+
+{% block title %} {{title}} {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body shadow-sm mb-4">
+            <h2 class="h5 mb-4">General information</h2>
+            <form>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div>
+                            <label for="first_name">First Name</label>
+                            <input class="form-control" id="first_name" type="text" placeholder="Enter your first name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div>
+                            <label for="last_name">Last Name</label>
+                            <input class="form-control" id="last_name" type="text" placeholder="Also your last name" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-3">
+                        <label for="birthday">Birthday</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><span class="far fa-calendar-alt"></span></span>
+                            <input data-datepicker="" class="form-control" id="birthday" type="text" placeholder="dd/mm/yyyy" required>                                               
+                          </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="gender">Gender</label>
+                        <select class="form-select mb-0" id="gender" aria-label="Gender select example">
+                            <option selected>Gender</option>
+                            <option value="1">Female</option>
+                            <option value="2">Male</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body shadow-sm mb-4">
+            <h2 class="h5 mb-4">Delete Account</h2>
+            <p class="text-danger">Warning! All your packages will be lost if you delete your account. This action cannot be undone.</p>
+
+            <!-- Button Modal -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div>
+                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-account"><span class="fas fa-minus mr-1"></span> Delete My Account </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="modal fade" id="modal-delete-account" tabindex="-1" role="dialog" aria-labelledby="modal-notification" aria-hidden="true">
+                <div class="modal-dialog modal-info modal-dialog-centered" role="document">
+                    <div class="modal-content bg-gradient-secondary">
+                        <div class="modal-header">
+                            <p class="modal-title" id="modal-title-notification">Please confirm deletion.</p>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="py-3 text-center">
+                                <span class="modal-icon display-1-lg"><span class="far fa-envelope-open"></span></span>
+                                <h2 class="h4 modal-title my-3">Important message!</h2>
+                                <p>Are you sure you want to delete your account? All your packages will be lost.</p>
+                                <p>This action cannot be undone.</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a class="btn btn-sm btn-danger" href="{{ url_for('main.delete_customer_account') }}"> Delete My Account </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of Modal Content -->
+
+
+
+
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

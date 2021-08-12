@@ -33,6 +33,25 @@ def customer_home():
     return render_template('customer_home.html', title='Home', package_data=package_data)
     
 
+@bp.route('/customer-account-settings', methods=['GET', 'POST'])
+@login_required(role='customer')
+def customer_settings():
+    return render_template('customer_settings.html', title='Customer Settings')
+
+
+@bp.route('/customer-account-deletion', methods=['GET', 'POST'])
+@login_required(role='customer')
+def delete_customer_account():
+    user_id = current_user.id
+    user = User.query.filter_by(id=user_id).first()
+    customer = Customer.query.filter_by(id=user_id).first()
+    db.session.delete(user)
+    db.session.delete(customer)
+    db.session.commit()
+    flash(('Your account has been deleted. All your information has been wiped from our database.'))
+    return redirect(url_for('main.index'))
+
+
 @bp.route('/admin/new-package', methods=['GET', 'POST'])
 @login_required(role='admin')
 def register_new_package():
@@ -338,6 +357,7 @@ def checkout():
     flash(('Order successful! Please make sure you have collected payment.'))
     return render_template('main/checkout_summary.html', title="Checkout Summary", checkout_data=checkout_data, order_number=order_number)
     
+
 
 
 
