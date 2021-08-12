@@ -159,10 +159,10 @@ class PackageUse(db.Model):
 class CompanyPackagesAndProducts(db.Model): # Get company packages list for form input
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
-    customer_orders = db.relationship('CustomerOrders', backref='customerorders', lazy='dynamic') # all services and items bought excluding those which are part of a package
     item_name = db.Column(db.String(128), nullable=False)
     item_price_in_cents = db.Column(db.Integer, nullable=True) # default price of package
     item_type = db.Column(db.String(128), nullable=False) # either "package" or "product"
+    customer_orders = db.relationship('CustomerOrders', backref='customerorders', lazy='dynamic') # all services and items bought excluding those which are part of a package
 
     def list_item_attributes(self):
         return {
@@ -179,6 +179,7 @@ class CustomerOrders(db.Model): # table to conslidate all cust orders
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id')) # which admin created the package
     package_or_product_id = db.Column(db.Integer, db.ForeignKey('company_packages_and_products.id')) # this uses snake case by default!!!
+    item_name = db.Column(db.String(128))
     price_per_item_in_cents = db.Column(db.Integer, nullable=True) # price customer paid for package
     discount_per_item_in_cents = db.Column(db.Integer, nullable=True) # discount for each item
     quantity = db.Column(db.Integer, nullable=False, default=1) # price customer paid for package

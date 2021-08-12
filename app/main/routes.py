@@ -238,7 +238,7 @@ def display_items(service_or_product):
     return render_template('main/display_company_items.html', title='Display {}'.format(service_or_product), company_item_data=company_item_data, form=form, service_or_product=service_or_product)
 
 
-@bp.route('/admin/edit_packages/<item_id>', methods=['GET', 'POST'])
+@bp.route('/admin/edit_item/<item_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
 def edit_existing_item(item_id):
     form = AddCompanyItemForm()
@@ -255,6 +255,21 @@ def edit_existing_item(item_id):
         form.item_name.data = package_data_dict['item_name']
         form.item_price.data = package_data_dict['item_price_in_cents'] / 100
     return render_template('main/edit_existing_item.html', title='Edit Item', form=form, package_data_dict=package_data_dict)
+
+
+
+@bp.route('/admin/delete_item/<item_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def delete_existing_item(item_id):
+    package_obj = CompanyPackagesAndProducts.query.filter_by(company_id=current_user.company_id).filter_by(id=item_id).first()
+    package_data_dict = package_obj.list_item_attributes()
+    service_or_product = package_data_dict['item_type']
+    item = CompanyPackagesAndProducts.query.filter_by(company_id=current_user.company_id).filter_by(id=item_id).first()
+    db.session.delete(item)
+    db.session.commit()
+    flash(('Successfully deleted item: {}'.format(package_data_dict['item_name'])))
+    return redirect(url_for('main.display_items', service_or_product=service_or_product))
+
 
 
 @bp.route('/admin/create-new-item', methods=['GET', 'POST'])
@@ -311,6 +326,7 @@ def checkout():
             company_id=d['company_id'], 
             admin_id=d['admin_id'],
             package_or_product_id=d['package_or_product_id'],
+            item_name = d['item_name'],
             price_per_item_in_cents=d['price_per_item_in_cents'],
             discount_per_item_in_cents=d['discount_per_item_in_cents'],
             quantity=d['quantity'],
