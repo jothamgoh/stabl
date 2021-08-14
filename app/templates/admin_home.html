@@ -232,11 +232,11 @@
                                     {% if not admin.is_superadmin %}
                                     {% if admin.is_active %}
                                     <div class="col text-right">
-                                        <a href="{{ url_for('main.deactivate_admin', admin_id=admin.id) }}" class="btn btn-sm btn-danger"><i class="fas fa-calendar-check me-1"></i>Deactivate</a>
+                                        <a href="{{ url_for('main.deactivate_admin', admin_id=admin.id) }}" class="btn btn-sm btn-danger"><i class="fas fa-user-minus me-1"></i>Deactivate</a>
                                     </div>
                                     {% else %}
                                     <div class="col text-right">
-                                        <a href="{{ url_for('main.activate_admin', admin_id=admin.id) }}" class="btn btn-sm btn-tertiary"><i class="fas fa-calendar-check me-1"></i>Activate</a>
+                                        <a href="{{ url_for('main.activate_admin', admin_id=admin.id) }}" class="btn btn-sm btn-tertiary"><i class="fas fa-user-plus me-1"></i>Activate</a>
                                     </div>
                                     {% endif %}
                                     {% endif %}
