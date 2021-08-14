@@ -21,7 +21,31 @@ def index():
 @bp.route('/admin/index', methods=['GET', 'POST'])
 @login_required(role='admin')
 def admin_home():
-    return render_template('admin_home.html', title='Home')
+    admins_obj = Admin.query.filter_by(company_id=current_user.company_id).all()
+    admin_data = [admin.list_admin_data() for admin in admins_obj]
+    return render_template('admin_home.html', title='Admin Dashboard', admin_data=admin_data)
+
+
+@bp.route('/admin/deactivate/<admin_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def deactivate_admin(admin_id):
+    a = Admin.query.filter_by(company_id=current_user.company_id).filter_by(id=admin_id).first()
+    admin_name = a.name
+    a.is_active = 0
+    db.session.commit()
+    flash(('Your have deactivated admin: {}.'.format(admin_name)))
+    return redirect(url_for('main.admin_home'))
+
+
+@bp.route('/admin/activate/<admin_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def activate_admin(admin_id):
+    a = Admin.query.filter_by(company_id=current_user.company_id).filter_by(id=admin_id).first()
+    admin_name = a.name
+    a.is_active = 1
+    db.session.commit()
+    flash(('Your have activated admin: {}.'.format(admin_name)))
+    return redirect(url_for('main.admin_home'))
 
 
 @bp.route('/home', methods=['GET', 'POST'])

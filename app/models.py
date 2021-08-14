@@ -71,6 +71,8 @@ class Admin(User):
     password_hash = db.Column(db.String(128))
     package_sold = db.relationship('Package', backref='admin', lazy='dynamic')
     cust_orders = db.relationship('CustomerOrders', backref='admin', lazy='dynamic') # all services and items bought excluding those which are part of a package
+    is_superadmin = db.Column(db.Boolean, default=0)
+    is_active = db.Column(db.Boolean, default=1)
 
 
     def set_password(self, password):
@@ -78,6 +80,15 @@ class Admin(User):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def list_admin_data(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'is_superadmin': self.is_superadmin,
+            'is_active': self.is_active
+        }
 
     @staticmethod
     def verify_reset_password_token(token):
