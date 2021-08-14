@@ -45,7 +45,7 @@ def admin_register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash(('Congratulations, {} is now a registered admin!'.format(user.email)))
+        flash(('Congratulations, {} is now a registered admin!'.format(user.email)), 'success')
         return redirect(url_for('auth.admin_login'))
     return render_template('auth/admin_register.html', title=('Register'),
                            form=form)
@@ -64,10 +64,10 @@ def customer_login():
             user = Customer.query.filter_by(email=form.phone_or_email.data).first()
         try:
             if user is None or not user.check_password(form.password.data): # check password returns an error if password is not set. Hence try except block added in
-                flash(('Invalid email, phone number or password'))
+                flash(('Invalid email, phone number or password'), 'danger')
                 return redirect(url_for('auth.customer_login'))
         except:
-            flash(('Your password is not set. Login using your phone number and OTP instead.'))
+            flash(('Your password is not set. Login using your phone number and OTP instead.'), 'danger')
             return redirect(url_for('auth.customer_login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -86,11 +86,11 @@ def customer_login_otp():
         try:
             phone_number = check_and_clean_phone_number(form.phone.data)
         except:
-            flash (invalid_phone_number_message())
+            flash (invalid_phone_number_message(), 'danger')
             return redirect(url_for('auth.customer_login_otp'))
         user = Customer.query.filter_by(phone=phone_number).first()
         if user is None:
-            flash(('Invalid phone number'))
+            flash(('Invalid phone number'), 'danger')
             return redirect(url_for('auth.customer_login_otp'))
         request_verification_token(phone_number)
         session['phone'] = phone_number  
@@ -122,7 +122,7 @@ def customer_otp():
             except:
                 return redirect(url_for('main.customer_home')) # if customer keys in wrong OTP first time round, error. This is the fallback
         else:
-            flash(('Invalid OTP. Please key in again'))
+            flash(('Invalid OTP. Please key in again'), 'danger')
             return redirect(url_for('auth.customer_otp'))
     return render_template('auth/customer_otp.html', title=('Key in One Time Password'), form=form)
 
@@ -151,13 +151,13 @@ def customer_register():
         try:
             phone_number = check_and_clean_phone_number(form.phone.data)
         except:
-            flash (invalid_phone_number_message())
+            flash (invalid_phone_number_message(), 'danger')
             return redirect(url_for('auth.customer_register'))
         user = Customer(name=form.name.data, email=form.email.data, phone=phone_number)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash(('Congratulations, {} is now a registered customer! Please ask them to log in'.format(user.phone)))
+        flash(('Congratulations, {} is now a registered customer! Please ask them to log in'.format(user.phone)), 'success')
         return redirect(url_for('main.admin_home'))
     return render_template('auth/customer_register.html', title=('Register'),
                            form=form)
@@ -172,7 +172,7 @@ def admin_reset_password_request():
         user = Admin.query.filter_by(email=form.email.data).first()
         if user:
             admin_send_password_reset_email(user)
-        flash('Check your email for the instructions to reset your password')
+        flash('Check your email for the instructions to reset your password', 'success')
         return redirect(url_for('auth.admin_login'))
     return render_template('auth/reset_password_request.html',
                            title='Reset Password', form=form)
@@ -189,7 +189,7 @@ def admin_reset_password(token):
     if form.validate_on_submit():
         user.set_password(form.password.data)
         db.session.commit()
-        flash('Your password has been reset.')
+        flash('Your password has been reset.', 'success')
         return redirect(url_for('auth.admin_login'))
     return render_template('auth/reset_password.html', form=form)
 
@@ -203,7 +203,7 @@ def customer_reset_password_request():
         user = Customer.query.filter_by(email=form.email.data).first()
         if user:
             customer_send_password_reset_email(user)
-        flash('Check your email for the instructions to reset your password')
+        flash('Check your email for the instructions to reset your password', 'success')
         return redirect(url_for('auth.customer_login'))
     return render_template('auth/reset_password_request.html',
                            title='Reset Password', form=form)
@@ -220,6 +220,6 @@ def customer_reset_password(token):
     if form.validate_on_submit():
         user.set_password(form.password.data)
         db.session.commit()
-        flash('Your password has been reset.')
+        flash('Your password has been reset.', 'success')
         return redirect(url_for('auth.customer_login'))
     return render_template('auth/reset_password.html', form=form)

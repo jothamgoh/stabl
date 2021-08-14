@@ -33,7 +33,7 @@ def deactivate_admin(admin_id):
     admin_name = a.name
     a.is_active = 0
     db.session.commit()
-    flash(('Your have deactivated admin: {}.'.format(admin_name)))
+    flash(('Your have deactivated admin: {}.'.format(admin_name)), 'danger')
     return redirect(url_for('main.admin_home'))
 
 
@@ -44,7 +44,7 @@ def activate_admin(admin_id):
     admin_name = a.name
     a.is_active = 1
     db.session.commit()
-    flash(('Your have activated admin: {}.'.format(admin_name)))
+    flash(('Your have activated admin: {}.'.format(admin_name)), 'success')
     return redirect(url_for('main.admin_home'))
 
 
@@ -66,17 +66,17 @@ def customer_settings():
         try:
             phone_number = check_and_clean_phone_number(form.phone.data)
         except:
-            flash(invalid_phone_number_message())
+            flash(invalid_phone_number_message(), 'danger')
             return redirect(url_for('main.customer_settings'))
         try:
             current_user.name = form.name.data
             current_user.email = form.email.data
             current_user.phone = phone_number
             db.session.commit()
-            flash('Your details have been updated.')
+            flash('Information successfully updated.', 'secondary')
             return redirect(url_for('main.customer_settings'))        
         except:
-            flash('The email or phone number you keyed in is already taken. Please use something else.')
+            flash('The email or phone number you keyed in is already taken. Please use something else.', 'danger')
             return redirect(url_for('main.customer_settings'))
     elif request.method == 'GET':
         form.name.data = customer_data['name']
@@ -94,7 +94,7 @@ def delete_customer_account():
     db.session.delete(user)
     db.session.delete(customer)
     db.session.commit()
-    flash(('Your account has been deleted. All your information has been wiped from our database.'))
+    flash(('Your account has been deleted. All your information has been wiped from our database.', 'danger'))
     return redirect(url_for('main.index'))
 
 
@@ -115,7 +115,7 @@ def register_new_package():
         company_id = company_id
 
         if package_num_total_uses_at_start <= package_num_used_when_keyed or package_price_paid_in_cents < 0:
-            flash(('The data you entered does not make sense. Please check and try again.'))
+            flash(('The data you entered does not make sense. Please check and try again.', 'danger'))
             return redirect(url_for('main.register_new_package'))
         new_package = Package(
             admin_id=current_user.get_id(), 
@@ -128,7 +128,7 @@ def register_new_package():
             )
         db.session.add(new_package)
         db.session.commit()
-        flash(('You have created a package for customer with phone number: {}'.format(phone_number)))
+        flash(('You have created a package for customer with phone number: {}'.format(phone_number)), 'success')
         # send_package_invoice_email(current_user)
         return redirect(url_for('main.admin_home'))
     return render_template('main/register_new_package.html', title='Key in package details', form=form)
@@ -146,7 +146,7 @@ def use_package(package_id):
     if num_uses_left <= 0:
         p.is_active = 0
         db.session.commit()
-        flash('You have finished using this package.')
+        flash('You have finished using this package.', 'danger')
         return redirect(url_for('main.display_package_summary', package_id=package_id))
     else:
         if num_uses_left == 1:
@@ -164,7 +164,7 @@ def use_package(package_id):
             package_use.who_used_package = 'self'
         db.session.add(package_use)
         db.session.commit()
-        flash('Congrats! You have used this package')
+        flash('Congrats! You have used this package', 'success')
         return redirect(url_for('main.display_package_summary', package_id=package_id))
     return render_template('customer_home.html', title='Home')
 
@@ -180,11 +180,11 @@ def transfer_package(package_id):
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
         if phone_number == current_user.phone:
-            flash('You cannot transfer a package to your own phone number.')
+            flash('You cannot transfer a package to your own phone number.', 'danger')
             return redirect(url_for('main.transfer_package', package_id=package_id))
         num_uses_to_transfer = form.num_uses_to_transfer.data
         if num_uses_left < num_uses_to_transfer: # not possible, redirect to same page
-            flash('You cannot transfer more uses than what you have. Please try again')
+            flash('You cannot transfer more uses than what you have. Please try again', 'danger')
             return redirect(url_for('main.transfer_package', package_id=package_id))
         else: 
             if num_uses_left==num_uses_to_transfer:
@@ -220,7 +220,7 @@ def transfer_package(package_id):
             db.session.add(p_recipient)
             db.session.commit()            
 
-            flash('You have transferred {} package/s to phone number: {}'.format(num_uses_to_transfer, phone_number))
+            flash('You have transferred {} package/s to phone number: {}'.format(num_uses_to_transfer, phone_number), 'success')
             return redirect(url_for('main.customer_home'))
     return render_template('main/transfer_package.html', title='Transfer package to a friend', form=form, package_data=package_data) 
 
@@ -263,7 +263,7 @@ def port_customer_and_package():
         db.session.commit()
 
         package_id=new_package.id
-        flash('Package successfully ported over. Please confirm details are correct.')
+        flash('Package successfully ported over. Please confirm details are correct.', 'success')
         return redirect(url_for('main.display_package_summary', package_id=package_id))
     return render_template('main/port_customer_and_package.html', title='Port package', form=form)
 
@@ -298,7 +298,7 @@ def display_items(service_or_product):
             )
         db.session.add(new_item)
         db.session.commit()
-        flash(('New {} "{}" added and can now be used.'.format(service_or_product, form.item_name.data)))
+        flash(('New {} "{}" added and can now be used.'.format(service_or_product, form.item_name.data)), 'success')
         return redirect(url_for('main.display_items', service_or_product=service_or_product))
     return render_template('main/display_company_items.html', title='Display {}'.format(service_or_product), company_item_data=company_item_data, form=form, service_or_product=service_or_product)
 
@@ -314,7 +314,7 @@ def edit_existing_item(item_id):
         package_obj.item_name = form.item_name.data 
         package_obj.item_price_in_cents = item_price_in_cents
         db.session.commit()
-        flash(('Successfully edited item: {}'.format(form.item_name.data)))
+        flash(('Successfully edited item: {}'.format(form.item_name.data)), 'success')
         return redirect(url_for('main.display_items', service_or_product=package_data_dict['item_type'])) 
     elif request.method == 'GET':
         form.item_name.data = package_data_dict['item_name']
@@ -332,7 +332,7 @@ def delete_existing_item(item_id):
     item = CompanyPackagesAndProducts.query.filter_by(company_id=current_user.company_id).filter_by(id=item_id).first()
     db.session.delete(item)
     db.session.commit()
-    flash(('Successfully deleted item: {}'.format(package_data_dict['item_name'])))
+    flash(('Successfully deleted item: {}'.format(package_data_dict['item_name'])), 'success')
     return redirect(url_for('main.display_items', service_or_product=service_or_product))
 
 
@@ -400,7 +400,7 @@ def checkout():
         db.session.add(new_item)
     db.session.commit()
     del session['checkout']
-    flash(('Order successful! Please make sure you have collected payment.'))
+    flash(('Order successful! Please make sure you have collected payment.'), 'success')
     return render_template('main/checkout_summary.html', title="Checkout Summary", checkout_data=checkout_data, order_number=order_number)
     
 
