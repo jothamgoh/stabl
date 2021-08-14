@@ -5,7 +5,7 @@ from app import db
 from flask import render_template, flash, session, redirect, url_for, request
 from app.decorators import login_required
 from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders
-from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyItemForm, CreateProductOrderForm, UpdateCustomerSettingsForm
+from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyItemForm, CreateProductOrderForm, UpdateCustomerSettingsForm, UpdateAdminSettingsForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -56,73 +56,6 @@ def customer_home():
     packages = Package.query.filter_by(cust_id=current_user.id).all()
     package_data = [package.list_customer_package_data() for package in packages]
     return render_template('customer_home.html', title='Home', package_data=package_data)
-    
-
-@bp.route('/customer-account-settings', methods=['GET', 'POST'])
-@login_required(role='customer')
-def customer_settings():
-    customer_data = Customer.query.filter_by(id=current_user.id).first().list_customer_data()
-    form_update_settings = UpdateCustomerSettingsForm()
-    form_password = ResetPasswordForm()
-    if request.method == 'GET':
-        form_update_settings.name.data = customer_data['name']
-        form_update_settings.email.data = customer_data['email']
-        form_update_settings.phone.data = customer_data['phone']
-    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
-
-
-@bp.route('/update-customer-account-settings', methods=['GET', 'POST'])
-@login_required(role='customer')
-def update_customer_settings():
-    form_update_settings = UpdateCustomerSettingsForm()
-    form_password = ResetPasswordForm()
-    if form_update_settings.validate_on_submit(): # change personal details form
-        try:
-            phone_number = check_and_clean_phone_number(form_update_settings.phone.data)
-        except:
-            flash(invalid_phone_number_message(), 'danger')
-            return redirect(url_for('main.customer_settings'))
-        try:
-            current_user.name = form_update_settings.name.data
-            current_user.email = form_update_settings.email.data
-            current_user.phone = phone_number
-            db.session.commit()
-            flash('Information successfully updated.', 'success')
-            return redirect(url_for('main.customer_settings'))        
-        except:
-            flash('The email or phone number you keyed in is already taken. Please use something else.', 'danger')
-            return redirect(url_for('main.customer_settings'))
-    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
-
-
-@bp.route('/update-customer-password', methods=['GET', 'POST'])
-@login_required(role='customer')
-def update_customer_password():
-    form_update_settings = UpdateCustomerSettingsForm()
-    form_password = ResetPasswordForm()
-    if form_password.validate_on_submit(): # reset password form
-        try:
-            current_user.set_password(form_password.password.data)
-        except:
-            flash('Passwords do not match.', 'danger')
-            return redirect(url_for('main.customer_settings'))
-        db.session.commit()
-        flash('Your password has been changed.', 'success')
-        return redirect(url_for('main.customer_settings'))
-    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
-
-
-@bp.route('/customer-account-deletion', methods=['GET', 'POST'])
-@login_required(role='customer')
-def delete_customer_account():
-    user_id = current_user.id
-    user = User.query.filter_by(id=user_id).first()
-    customer = Customer.query.filter_by(id=user_id).first()
-    db.session.delete(user)
-    db.session.delete(customer)
-    db.session.commit()
-    flash(('Your account has been deleted. All your information has been wiped from our database.', 'danger'))
-    return redirect(url_for('main.index'))
 
 
 @bp.route('/admin/new-package', methods=['GET', 'POST'])
@@ -431,6 +364,117 @@ def checkout():
     return render_template('main/checkout_summary.html', title="Checkout Summary", checkout_data=checkout_data, order_number=order_number)
     
 
+@bp.route('/customer-account-settings', methods=['GET', 'POST'])
+@login_required(role='customer')
+def customer_settings():
+    customer_data = Customer.query.filter_by(id=current_user.id).first().list_customer_data()
+    form_update_settings = UpdateCustomerSettingsForm()
+    form_password = ResetPasswordForm()
+    if request.method == 'GET':
+        form_update_settings.name.data = customer_data['name']
+        form_update_settings.email.data = customer_data['email']
+        form_update_settings.phone.data = customer_data['phone']
+    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
+
+
+@bp.route('/update-customer-account-settings', methods=['GET', 'POST'])
+@login_required(role='customer')
+def update_customer_settings():
+    form_update_settings = UpdateCustomerSettingsForm()
+    form_password = ResetPasswordForm()
+    if form_update_settings.validate_on_submit(): # change personal details form
+        try:
+            phone_number = check_and_clean_phone_number(form_update_settings.phone.data)
+        except:
+            flash(invalid_phone_number_message(), 'danger')
+            return redirect(url_for('main.customer_settings'))
+        try:
+            current_user.name = form_update_settings.name.data
+            current_user.email = form_update_settings.email.data
+            current_user.phone = phone_number
+            db.session.commit()
+            flash('Information successfully updated.', 'success')
+            return redirect(url_for('main.customer_settings'))        
+        except:
+            flash('The email or phone number you keyed in is already taken. Please use something else.', 'danger')
+            return redirect(url_for('main.customer_settings'))
+    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
+
+
+@bp.route('/update-customer-password', methods=['GET', 'POST'])
+@login_required(role='customer')
+def update_customer_password():
+    form_update_settings = UpdateCustomerSettingsForm()
+    form_password = ResetPasswordForm()
+    if form_password.validate_on_submit(): # reset password form
+        try:
+            current_user.set_password(form_password.password.data)
+        except:
+            flash('Passwords do not match.', 'danger')
+            return redirect(url_for('main.customer_settings'))
+        db.session.commit()
+        flash('Your password has been changed.', 'success')
+        return redirect(url_for('main.customer_settings'))
+    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
+
+
+@bp.route('/admin-account-settings', methods=['GET', 'POST'])
+@login_required(role='admin')
+def admin_settings():
+    admin_data = Admin.query.filter_by(id=current_user.id).first().list_admin_data()
+    form_update_settings = UpdateCustomerSettingsForm()
+    form_password = ResetPasswordForm()
+    if request.method == 'GET':
+        form_update_settings.name.data = admin_data['name']
+        form_update_settings.email.data = admin_data['email']
+    return render_template('admin_settings.html', title='Admin Settings', form_update_settings=form_update_settings, form_password=form_password)
+
+
+@bp.route('/update-admin-account-settings', methods=['GET', 'POST'])
+@login_required(role='admin')
+def update_admin_settings():
+    form_update_settings = UpdateAdminSettingsForm()
+    form_password = ResetPasswordForm()
+    if form_update_settings.validate_on_submit(): # change personal details form
+        try:
+            current_user.name = form_update_settings.name.data
+            current_user.email = form_update_settings.email.data
+            db.session.commit()
+            flash('Information successfully updated.', 'success')
+            return redirect(url_for('main.admin_settings'))        
+        except:
+            flash('The email you keyed in is already taken. Please use something else.', 'danger')
+            return redirect(url_for('main.admin_settings'))
+    return render_template('admin_settings.html', title='Admin Settings', form_update_settings=form_update_settings, form_password=form_password)
+
+@bp.route('/update-admin-password', methods=['GET', 'POST'])
+@login_required(role='admin')
+def update_admin_password():
+    form_update_settings = UpdateAdminSettingsForm()
+    form_password = ResetPasswordForm()
+    if form_password.validate_on_submit(): # reset password form
+        try:
+            current_user.set_password(form_password.password.data)
+        except:
+            flash('Passwords do not match.', 'danger')
+            return redirect(url_for('main.admin_settings'))
+        db.session.commit()
+        flash('Your password has been changed.', 'success')
+        return redirect(url_for('main.admin_settings'))
+    return render_template('admin_settings.html', title='Admin Settings', form_update_settings=form_update_settings, form_password=form_password)
+
+
+@bp.route('/customer-account-deletion', methods=['GET', 'POST'])
+@login_required(role='customer')
+def delete_customer_account():
+    user_id = current_user.id
+    user = User.query.filter_by(id=user_id).first()
+    customer = Customer.query.filter_by(id=user_id).first()
+    db.session.delete(user)
+    db.session.delete(customer)
+    db.session.commit()
+    flash(('Your account has been deleted. All your information has been wiped from our database.', 'danger'))
+    return redirect(url_for('main.index'))
 
 
 
