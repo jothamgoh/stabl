@@ -66,11 +66,11 @@ class CreateProductOrderForm(FlaskForm):
     submit = SubmitField(('Add Product'))
 
 
-class CustomerSettingsForm(FlaskForm):
+class UpdateCustomerSettingsForm(FlaskForm):
     name = StringField(('Name'), validators=[DataRequired()])
     phone = StringField(('Phone Number'), validators=[DataRequired()])
     email = StringField(('Email'), validators=[DataRequired(), Email()])
-    submit = SubmitField(('Register'))
+    submit = SubmitField(('Submit'))
 
 
 # class SearchCustomerForm(FlaskForm):

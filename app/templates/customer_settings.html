@@ -6,21 +6,22 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+<!-- Edit personal information -->
 <div class="row">
     <div class="col-12 col-xl-12">
         <div class="card card-body shadow-sm mb-4">
             <h2 class="h5 mb-4">Your information</h2>
-            <form method="post">
-                {{ form.hidden_tag() }}
+            <form action="{{ url_for('main.update_customer_settings') }}" method="post">
+                {{ form_update_settings.hidden_tag() }}
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <div>
                             <label for="Name">Name</label>
                             <div class="input-group">
                                 <span class="input-group-text"><span class="fas fa-user-circle"></span></span>
-                                {{ form.name(placeholder="Name", class="form-control") }}
+                                {{ form_update_settings.name(placeholder="Name", class="form-control") }}
                             </div>  
-                            <p class="text-danger">{% for errors in form.name.errors %}{{ errors }}{% endfor %}</p>
+                            <p class="text-danger">{% for errors in form_update_settings.name.errors %}{{ errors }}{% endfor %}</p>
                         </div>
                     </div>
                 </div>
@@ -29,18 +30,18 @@
                         <label for="email">Your Email</label>
                         <div class="input-group">
                             <span class="input-group-text"><span class="fas fa-envelope"></span></span>
-                            {{ form.email(placeholder="Email", class="form-control") }}
+                            {{ form_update_settings.email(placeholder="Email", class="form-control") }}
                         </div>
-                        <p class="text-danger">{% for errors in form.email.errors %}{{ errors }}{% endfor %}</p>
+                        <p class="text-danger">{% for errors in form_update_settings.email.errors %}{{ errors }}{% endfor %}</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <div>
                             <label for="email">Singapore Phone Number</label>
                             <div class="input-group">
                                 <span class="input-group-text"><span class="fas fa-phone"></span></span>
-                                {{ form.phone(placeholder="phone", class="form-control") }}
+                                {{ form_update_settings.phone(placeholder="Phone", class="form-control") }}
                             </div>
-                            <p class="text-danger">{% for errors in form.phone.errors %}{{ errors }}{% endfor %}</p>
+                            <p class="text-danger">{% for errors in form_update_settings.phone.errors %}{{ errors }}{% endfor %}</p>
                         </div>
                     </div>
                 </div>
@@ -49,6 +50,41 @@
         </div>
     </div>
 </div>
+<!-- End personal information -->
+
+<!-- Change password form -->
+<div class="row">
+    <div class="col-12 col-xl-12">
+        <div class="card card-body shadow-sm mb-4">
+            <h2 class="h5 mb-4">Change your password</h2>
+            <form action="{{ url_for('main.update_customer_password') }}" method="post">
+                {{ form_password.hidden_tag() }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password">New Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><span class="fas fa-unlock-alt"></span></span>
+                            {{ form_password.password(placeholder="New password", class="form-control", type="password") }}
+                        </div>
+                        <p class="text-danger">{% for errors in form_password.password.errors %}{{ errors }}{% endfor %}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div>
+                            <label for="password">Confirm New Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><span class="fas fa-unlock-alt"></span></span>
+                                {{ form_password.password2(placeholder="Confirm new password", class="form-control", type="password") }}
+                            </div>  
+                        <p class="text-danger">{% for errors in form_password.password2.errors %}{{ errors }}{% endfor %}</p>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" name="submit" class="btn btn-secondary">Change Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End change password form -->
 
 <div class="row">
     <div class="col-12 col-xl-12">

@@ -1,10 +1,11 @@
+from app.auth.forms import ResetPasswordForm
 from re import search
 from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for, request
 from app.decorators import login_required
 from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders
-from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyItemForm, CreateProductOrderForm, CustomerSettingsForm
+from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyItemForm, CreateProductOrderForm, UpdateCustomerSettingsForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -61,28 +62,54 @@ def customer_home():
 @login_required(role='customer')
 def customer_settings():
     customer_data = Customer.query.filter_by(id=current_user.id).first().list_customer_data()
-    form = CustomerSettingsForm()
-    if form.validate_on_submit():
+    form_update_settings = UpdateCustomerSettingsForm()
+    form_password = ResetPasswordForm()
+    if request.method == 'GET':
+        form_update_settings.name.data = customer_data['name']
+        form_update_settings.email.data = customer_data['email']
+        form_update_settings.phone.data = customer_data['phone']
+    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
+
+
+@bp.route('/update-customer-account-settings', methods=['GET', 'POST'])
+@login_required(role='customer')
+def update_customer_settings():
+    form_update_settings = UpdateCustomerSettingsForm()
+    form_password = ResetPasswordForm()
+    if form_update_settings.validate_on_submit(): # change personal details form
         try:
-            phone_number = check_and_clean_phone_number(form.phone.data)
+            phone_number = check_and_clean_phone_number(form_update_settings.phone.data)
         except:
             flash(invalid_phone_number_message(), 'danger')
             return redirect(url_for('main.customer_settings'))
         try:
-            current_user.name = form.name.data
-            current_user.email = form.email.data
+            current_user.name = form_update_settings.name.data
+            current_user.email = form_update_settings.email.data
             current_user.phone = phone_number
             db.session.commit()
-            flash('Information successfully updated.', 'secondary')
+            flash('Information successfully updated.', 'success')
             return redirect(url_for('main.customer_settings'))        
         except:
             flash('The email or phone number you keyed in is already taken. Please use something else.', 'danger')
             return redirect(url_for('main.customer_settings'))
-    elif request.method == 'GET':
-        form.name.data = customer_data['name']
-        form.email.data = customer_data['email']
-        form.phone.data = customer_data['phone']
-    return render_template('customer_settings.html', title='Customer Settings', form=form)
+    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
+
+
+@bp.route('/update-customer-password', methods=['GET', 'POST'])
+@login_required(role='customer')
+def update_customer_password():
+    form_update_settings = UpdateCustomerSettingsForm()
+    form_password = ResetPasswordForm()
+    if form_password.validate_on_submit(): # reset password form
+        try:
+            current_user.set_password(form_password.password.data)
+        except:
+            flash('Passwords do not match.', 'danger')
+            return redirect(url_for('main.customer_settings'))
+        db.session.commit()
+        flash('Your password has been changed.', 'success')
+        return redirect(url_for('main.customer_settings'))
+    return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
 
 
 @bp.route('/customer-account-deletion', methods=['GET', 'POST'])
