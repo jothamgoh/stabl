@@ -9,39 +9,42 @@
 <div class="row">
     <div class="col-12 col-xl-12">
         <div class="card card-body shadow-sm mb-4">
-            <h2 class="h5 mb-4">General information</h2>
-            <form>
+            <h2 class="h5 mb-4">Your information</h2>
+            <form method="post">
+                {{ form.hidden_tag() }}
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div>
+                            <label for="Name">Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><span class="fas fa-user-circle"></span></span>
+                                {{ form.name(placeholder="Name", class="form-control") }}
+                            </div>  
+                            <p class="text-danger">{% for errors in form.name.errors %}{{ errors }}{% endfor %}</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <div>
-                            <label for="first_name">First Name</label>
-                            <input class="form-control" id="first_name" type="text" placeholder="Enter your first name" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div>
-                            <label for="last_name">Last Name</label>
-                            <input class="form-control" id="last_name" type="text" placeholder="Also your last name" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="row align-items-center">
-                    <div class="col-md-6 mb-3">
-                        <label for="birthday">Birthday</label>
+                        <label for="email">Your Email</label>
                         <div class="input-group">
-                            <span class="input-group-text"><span class="far fa-calendar-alt"></span></span>
-                            <input data-datepicker="" class="form-control" id="birthday" type="text" placeholder="dd/mm/yyyy" required>                                               
-                          </div>
+                            <span class="input-group-text"><span class="fas fa-envelope"></span></span>
+                            {{ form.email(placeholder="Email", class="form-control") }}
+                        </div>
+                        <p class="text-danger">{% for errors in form.email.errors %}{{ errors }}{% endfor %}</p>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="gender">Gender</label>
-                        <select class="form-select mb-0" id="gender" aria-label="Gender select example">
-                            <option selected>Gender</option>
-                            <option value="1">Female</option>
-                            <option value="2">Male</option>
-                        </select>
+                        <div>
+                            <label for="email">Singapore Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><span class="fas fa-phone"></span></span>
+                                {{ form.phone(placeholder="phone", class="form-control") }}
+                            </div>
+                            <p class="text-danger">{% for errors in form.phone.errors %}{{ errors }}{% endfor %}</p>
+                        </div>
                     </div>
                 </div>
+                <button type="submit" name="submit" class="btn btn-secondary">Update Information</button>
             </form>
         </div>
     </div>

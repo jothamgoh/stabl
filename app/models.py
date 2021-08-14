@@ -49,6 +49,14 @@ class Customer(User):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def list_customer_data(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'phone': self.phone,
+            'email': self.email
+        }
+
     @staticmethod
     def verify_reset_password_token(token):
         try:

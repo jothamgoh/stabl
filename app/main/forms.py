@@ -2,20 +2,11 @@ from flask.app import Flask
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField, DecimalField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import ValidationError, DataRequired, InputRequired
+from wtforms.validators import ValidationError, DataRequired, InputRequired, Email
 from app.helperfunc import check_and_clean_phone_number
 from flask_login import current_user
 from app.models import Company
 
-
-def get_company_packages():
-    company_id = current_user.company_id
-    package_choices = []
-    company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages.all()
-    [package_choices.append(p.package_name) for p in company_packages_obj]
-    return package_choices
-
-# package_choices = ['Haircut men', 'Haircut women']
 
 class RegisterPackageForm(FlaskForm):
     phone = StringField(('Customer Phone Number'), validators=[DataRequired()])
@@ -73,6 +64,13 @@ class CreateProductOrderForm(FlaskForm):
     item_discount = DecimalField(('Item Discount (SGD)'), places=2) 
     item_quantity = IntegerField(('Quantity'), validators=[DataRequired()]) 
     submit = SubmitField(('Add Product'))
+
+
+class CustomerSettingsForm(FlaskForm):
+    name = StringField(('Name'), validators=[DataRequired()])
+    phone = StringField(('Phone Number'), validators=[DataRequired()])
+    email = StringField(('Email'), validators=[DataRequired(), Email()])
+    submit = SubmitField(('Register'))
 
 
 # class SearchCustomerForm(FlaskForm):
