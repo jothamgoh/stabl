@@ -1,4 +1,8 @@
+{% if current_user.role =='customer' %}
 {% extends "layouts/base-customer.html" %}
+{% else %}
+{% extends "layouts/base-admin.html" %}
+{% endif %}
 
 {% block title %} Customer Home {% endblock %} 
 
@@ -60,13 +64,19 @@
                                 </div>
                             </div>
                             <div class="modal-footer d-flex justify-content-center pt-0 pb-3">
+                                {% if current_user.role == 'customer' %}
                                 <a class="btn btn-sm btn-white text-tertiary" href="{{ url_for('main.use_package', package_id=package.package_id) }}"> Use Package </a>
+                                {% else %}
+                                <a class="btn btn-sm btn-white text-tertiary" href="{{ url_for('main.use_package', package_id=package.package_id) }}"> Use Package </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- End of Modal Content -->
+                {% if current_user.role == 'customer' %}
                 <a class="btn btn-sm btn-secondary" href="{{ url_for('main.transfer_package', package_id=package.package_id) }}"><span class="fas fa-user-plus mr-1"></span> Transfer Package </a>
+                {% endif %}
                 {% endif %}
                 <a class="btn btn-sm btn-info" href="{{ url_for('main.display_package_summary', package_id=package.package_id) }}"><span class="fas fa-list mr-1"></span> Details </a>
                 <!-- <a class="btn btn-sm btn-primary" href="{{ url_for('main.display_package_invoice', package_id=package.package_id) }}"><span class="fas fa-file-invoice mr-1"></span> Invoice </a> -->

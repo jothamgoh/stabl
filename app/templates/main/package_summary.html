@@ -1,4 +1,8 @@
+{% if current_user.role =='customer' %}
 {% extends "layouts/base-customer.html" %}
+{% else %}
+{% extends "layouts/base-admin.html" %}
+{% endif %}
 
 {% block title %} Package Summary {% endblock %} 
 
@@ -34,6 +38,22 @@
                     <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Date package bought:</b> {{ package_data.created_at }} </h6>
                     <h6 class="fw-normal text-gray"><span class="icon w-20 icon-xs icon-tertiary me-1"><span class="fas fa-tablet-alt"></span></span> <b>Company:</b> {{ package_data.company }} </h6>
                 </div>
+
+                {% if current_user.role=='customer' %}
+                <div class="mb-3">
+                <a class="btn btn-sm btn-info" href="{{ url_for('main.customer_home') }}"><span class="fas fa-home"></span> Back To Home </a>
+                </div>
+                {% else %}
+                <div class="mb-3">
+                    <a class="btn btn-sm btn-secondary" href="{{ url_for('main.port_customer_and_package') }}"><span class="fas fa-exchange-alt"></span> Port New Package </a>
+                </div>
+                <div class="mb-3">
+                    <a class="btn btn-sm btn-tertiary" href="{{ url_for('main.customer_home_admin_view', cust_id=session['cust_id']) }}"><span class="fas fa-box"></span> View Customer Packages</a>
+                </div>
+                <div class="mb-3">
+                    <a class="btn btn-sm btn-info" href="{{ url_for('main.admin_home')}}"><span class="fas fa-home"></span> Admin Homepage </a>
+                </div>
+                {% endif %}
 
                 <!-- Package Use -->
                 <div class="card-header">
@@ -85,12 +105,6 @@
                     {% endif %}
                 
                 {% endfor %}
-
-                {% if current_user.role=='customer' %}
-                <a class="btn btn-sm btn-primary" href="{{ url_for('main.customer_home') }}"><span class="fas fa-home"></span> Return Home </a>
-                {% elif current_user.role=='admin' %}
-                <a class="btn btn-sm btn-primary" href="{{ url_for('main.port_customer_and_package') }}"><span class="fas fa-exchange-alt"></span> Port Another Package </a>
-                {% endif %}
                 </div>
                 </div>
                 </div>

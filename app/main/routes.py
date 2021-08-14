@@ -5,7 +5,7 @@ from app import db
 from flask import render_template, flash, session, redirect, url_for, request
 from app.decorators import login_required
 from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders
-from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, AddCompanyItemForm, CreateProductOrderForm, UpdateCustomerSettingsForm, UpdateAdminSettingsForm
+from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, SearchCustomerForm, AddCompanyItemForm, CreateProductOrderForm, UpdateCustomerSettingsForm, UpdateAdminSettingsForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -57,6 +57,40 @@ def customer_home():
     package_data = [package.list_customer_package_data() for package in packages]
     return render_template('customer_home.html', title='Home', package_data=package_data)
 
+@bp.route('/admin/search-customer', methods=['GET', 'POST'])
+@login_required(role='admin')
+def search_for_customer(): # this does not filter customer by company. This filters every customer in the database with Stabl
+    company_id = current_user.company_id
+    form = SearchCustomerForm()
+    if form.validate_on_submit():
+        # try to find customer using phone or email
+        try: # case when customer keys in phone number
+            phone_number = check_and_clean_phone_number(form.phone_or_email.data) # if email, exception is raised. if phone number is invalid 'None' returned
+            customer = Customer.query.filter_by(phone=phone_number).first()
+        except: # case when customer keys in email or if phone number is invalid
+            customer = Customer.query.filter_by(email=form.phone_or_email.data).first()
+        if customer is None :
+            flash(('Customer email or phone not found. Please try again'), 'danger')
+            del session['cust_id']
+            return redirect(url_for('main.search_for_customer'))
+        count_num_packages = Package.query.filter_by(company_id=company_id).filter_by(cust_id=customer.id).count()
+        if count_num_packages == 0: # if customer exists, but does not have any packages with the salon
+            flash(('Customer does not have any existing packages with your company.'), 'danger')
+            del session['cust_id']
+            return redirect(url_for('main.search_for_customer'))
+        session['cust_id'] = customer.id 
+        return redirect(url_for('main.customer_home_admin_view', cust_id=session['cust_id']))
+    return render_template('main/search_for_customer.html', title='Find customer', form=form)
+
+
+@bp.route('/admin/customer-home/<cust_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def customer_home_admin_view(cust_id):
+    # list package data
+    packages = Package.query.filter_by(company_id=current_user.company_id).filter_by(cust_id=session['cust_id']).all()
+    package_data = [package.list_customer_package_data() for package in packages]
+    return render_template('customer_home.html', title='Home', package_data=package_data)
+
 
 @bp.route('/admin/new-package', methods=['GET', 'POST'])
 @login_required(role='admin')
@@ -95,7 +129,7 @@ def register_new_package():
 
 
 @bp.route('/package/use-package/<package_id>', methods=['GET', 'POST'])
-@login_required(role='customer')
+@login_required()
 def use_package(package_id):
     package_user_id = current_user.id
     package_user_role = User.query.filter_by(id=package_user_id).first().role
@@ -112,8 +146,6 @@ def use_package(package_id):
         if num_uses_left == 1:
             p.is_active = 0
         p.package_num_times_used_after_keyed = p.package_num_times_used_after_keyed + 1
-
-
         # insert package use data
         package_use = PackageUse(package_id=package_id)
         package_use.num_uses = 1 # number times package used is 1 time
@@ -127,6 +159,18 @@ def use_package(package_id):
         flash('Congrats! You have used this package', 'success')
         return redirect(url_for('main.display_package_summary', package_id=package_id))
     return render_template('customer_home.html', title='Home')
+
+
+@bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])
+@login_required()
+def display_package_summary(package_id):
+    package = Package.query.filter_by(id=package_id).first_or_404()
+    package_data = package.list_customer_package_data()
+    
+    package_use_list = package.package_usage.order_by(PackageUse.created_at.desc()).all()
+    package_use_data = [package_use.list_package_use_data() for package_use in package_use_list]
+
+    return render_template('main/package_summary.html', title='Package Summary', package_data=package_data, package_use_data=package_use_data)
 
 
 @bp.route('/package/transfer-package/<package_id>', methods=['GET', 'POST'])
@@ -183,18 +227,6 @@ def transfer_package(package_id):
             flash('You have transferred {} package/s to phone number: {}'.format(num_uses_to_transfer, phone_number), 'success')
             return redirect(url_for('main.customer_home'))
     return render_template('main/transfer_package.html', title='Transfer package to a friend', form=form, package_data=package_data) 
-
-
-@bp.route('/package/package-summary/<package_id>', methods=['GET', 'POST'])
-@login_required()
-def display_package_summary(package_id):
-    package = Package.query.filter_by(id=package_id).first_or_404()
-    package_data = package.list_customer_package_data()
-    
-    package_use_list = package.package_usage.order_by(PackageUse.created_at.desc()).all()
-    package_use_data = [package_use.list_package_use_data() for package_use in package_use_list]
-
-    return render_template('main/package_summary.html', title='Package Summary', package_data=package_data, package_use_data=package_use_data)
 
 
 @bp.route('/admin/port-package', methods=['GET', 'POST'])
@@ -282,7 +314,6 @@ def edit_existing_item(item_id):
     return render_template('main/edit_existing_item.html', title='Edit Item', form=form, package_data_dict=package_data_dict)
 
 
-
 @bp.route('/admin/delete_item/<item_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
 def delete_existing_item(item_id):
@@ -294,7 +325,6 @@ def delete_existing_item(item_id):
     db.session.commit()
     flash(('Successfully deleted item: {}'.format(package_data_dict['item_name'])), 'success')
     return redirect(url_for('main.display_items', service_or_product=service_or_product))
-
 
 
 @bp.route('/admin/create-new-item', methods=['GET', 'POST'])
@@ -333,7 +363,6 @@ def add_item_to_cart():
 def clear_cart():
     session.pop('checkout', None)
     return redirect(url_for('main.add_item_to_cart'))
-
 
 
 @bp.route('/admin/checkout', methods=['GET', 'POST'])
@@ -418,6 +447,19 @@ def update_customer_password():
     return render_template('customer_settings.html', title='Customer Settings', form_update_settings=form_update_settings, form_password=form_password)
 
 
+@bp.route('/customer-account-deletion', methods=['GET', 'POST'])
+@login_required(role='customer')
+def delete_customer_account():
+    user_id = current_user.id
+    user = User.query.filter_by(id=user_id).first()
+    customer = Customer.query.filter_by(id=user_id).first()
+    db.session.delete(user)
+    db.session.delete(customer)
+    db.session.commit()
+    flash(('Your account has been deleted. All your information has been wiped from our database.', 'danger'))
+    return redirect(url_for('main.index'))
+
+
 @bp.route('/admin-account-settings', methods=['GET', 'POST'])
 @login_required(role='admin')
 def admin_settings():
@@ -447,6 +489,7 @@ def update_admin_settings():
             return redirect(url_for('main.admin_settings'))
     return render_template('admin_settings.html', title='Admin Settings', form_update_settings=form_update_settings, form_password=form_password)
 
+
 @bp.route('/update-admin-password', methods=['GET', 'POST'])
 @login_required(role='admin')
 def update_admin_password():
@@ -464,17 +507,7 @@ def update_admin_password():
     return render_template('admin_settings.html', title='Admin Settings', form_update_settings=form_update_settings, form_password=form_password)
 
 
-@bp.route('/customer-account-deletion', methods=['GET', 'POST'])
-@login_required(role='customer')
-def delete_customer_account():
-    user_id = current_user.id
-    user = User.query.filter_by(id=user_id).first()
-    customer = Customer.query.filter_by(id=user_id).first()
-    db.session.delete(user)
-    db.session.delete(customer)
-    db.session.commit()
-    flash(('Your account has been deleted. All your information has been wiped from our database.', 'danger'))
-    return redirect(url_for('main.index'))
+
 
 
 
@@ -498,23 +531,4 @@ def delete_customer_account():
 
 
 
-# @bp.route('/admin/search-customer', methods=['GET', 'POST'])
-# @login_required(role='admin')
-# def search_for_customer(): # this does not filter customer by company. This filters every customer in the database with Stabl
-#     form = SearchCustomerForm()
-#     if form.validate_on_submit():
-#         # try to find customer using phone or email
-#         try: # case when customer keys in phone number
-#             phone_number = check_and_clean_phone_number(form.phone_or_email.data) # if email, exception is raised. if phone number is invalid 'None' returned
-#             customer = Customer.query.filter_by(phone=phone_number).first()
-#             session['phone_or_email'] = phone_number
-#         except: # case when customer keys in email or if phone number is invalid
-#             customer = Customer.query.filter_by(email=form.phone_or_email.data).first()
-#             session['phone_or_email'] = form.phone_or_email.data
-#         if customer is None:
-#             flash(('Customer email or phone not found. Please try again'))
-#             del session['phone_or_email']
-#             return redirect(url_for('main.search_for_customer'))
-#         session['cust_id'] = customer.id 
-#         return redirect(url_for('main.register_new_package'))
-#     return render_template('main/search_for_customer.html', title='Find customer', form=form)
+

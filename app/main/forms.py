@@ -79,6 +79,6 @@ class UpdateAdminSettingsForm(FlaskForm):
     submit = SubmitField(('Submit'))
 
 
-# class SearchCustomerForm(FlaskForm):
-#     phone_or_email = StringField(('Phone Number or Email'), validators=[DataRequired()])
-#     submit = SubmitField(('Search for Customer'))
+class SearchCustomerForm(FlaskForm):
+    phone_or_email = StringField(('Phone Number or Email'), validators=[DataRequired()])
+    submit = SubmitField(('Search for Customer'))

@@ -1,12 +1,44 @@
-{% extends 'base.html' %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "layouts/base-fullscreen.html" %}
 
-{% block app_content %}
-    <h1>Find customer:</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
-        </div>
-    </div>
-    <br>
-{% endblock %}
+{% block title %} Register New Package {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <section class="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
+            <div class="container">
+                <p class="text-center"><a href="{{ url_for('main.admin_home') }}" class="text-gray-700"><i class="fas fa-angle-left me-2"></i>Back to homepage</a></p>
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="mb-4 mb-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">Find Customer</h1>
+                            </div>
+                            <form method="post" action="" class="mt-4">
+                                {{ form.hidden_tag() }}
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Customer's Phone or Email</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-phone"></span> / <span class="fas fa-envelope"></span></span>
+                                        {{ form.phone_or_email(placeholder="Phone or Email", class="form-control") }}
+                                    </div>  
+                                    <p class="text-danger">{% for errors in form.phone_or_email.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+                                <div class="d-grid">
+                                    <button type="submit" name="submit" class="btn btn-dark">Search For Customer</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+        </section>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
