@@ -4,8 +4,8 @@ from app.main import bp
 from app import db
 from flask import render_template, flash, session, redirect, url_for, request
 from app.decorators import login_required
-from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders
-from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, SearchCustomerForm, AddCompanyItemForm, CreateProductOrderForm, UpdateCustomerSettingsForm, UpdateAdminSettingsForm
+from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders, Outlet
+from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, SearchCustomerForm, AddCompanyItemForm, CreateProductOrderForm, UpdateCustomerSettingsForm, UpdateAdminSettingsForm, UpdateAdminOutletForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -293,6 +293,24 @@ def display_items(service_or_product):
         flash(('New {} "{}" added and can now be used.'.format(service_or_product, form.item_name.data)), 'success')
         return redirect(url_for('main.display_items', service_or_product=service_or_product))
     return render_template('main/display_company_items.html', title='Display {}'.format(service_or_product), company_item_data=company_item_data, form=form, service_or_product=service_or_product)
+
+
+@bp.route('/admin/change-outlet', methods=['GET', 'POST'])
+@login_required(role='admin')
+def change_admin_outlet():
+    form = UpdateAdminOutletForm()
+    company_id = current_user.company_id
+    outlets_obj = Outlet.query.filter_by(company_id=company_id).all()
+    form.outlet_chosen.choices = [(outlet.outlet_name) for outlet in outlets_obj]
+    if form.validate_on_submit():
+        outlet_name = form.outlet_chosen.data
+        outlet_id = Outlet.query.filter_by(company_id=company_id).filter_by(outlet_name=outlet_name).first().id
+        current_user.outlet_id = outlet_id
+        current_user.outlet_name = outlet_name
+        db.session.commit()
+        flash('{} is now your default outlet'.format(outlet_name), 'success')
+        return redirect(request.referrer)
+    return render_template('main/change_admin_outlet.html', title='test', form=form)
 
 
 @bp.route('/admin/edit_item/<item_id>', methods=['GET', 'POST'])

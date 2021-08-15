@@ -1,0 +1,46 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %} Register New Package {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <section class="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
+            <div class="container">
+                <p class="text-center"><a href="{{ url_for('main.admin_home') }}" class="text-gray-700"><i class="fas fa-angle-left me-2"></i>Back to homepage</a></p>
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="mb-4 mb-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">Current Outlet: {{current_user.outlet_name }}</h1>
+                            </div>
+
+                            <form method="post" action="" class="mt-4">
+                                {{ form.hidden_tag() }}
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Choose Your Outlet</label>
+                                    <div class="input-group">
+                                        {{ form.outlet_chosen(class="form-select") }}
+                                    </div>
+                                    <p class="text-danger">{% for errors in form.outlet_chosen.errors %}{{ errors }}{% endfor %}</p>
+                                    <p class="small"> <u><a class="text-info" href="{{ url_for('main.display_items', service_or_product='service') }}">Add a new outlet here</a></u> if you can't find what you want</p>
+                                </div>
+                                <!-- End of Form --> 
+                                <div class="d-grid">
+                                    <button type="submit" name="submit" class="btn btn-dark">Change Default Outlet</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+            </div>
+        </section>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

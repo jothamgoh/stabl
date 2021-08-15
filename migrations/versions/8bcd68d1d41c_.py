@@ -1,8 +1,8 @@
-"""initial
+"""empty message
 
-Revision ID: 9a71786016a5
+Revision ID: 8bcd68d1d41c
 Revises: 
-Create Date: 2021-08-04 22:02:51.868211
+Create Date: 2021-08-15 21:57:59.849046
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9a71786016a5'
+revision = '8bcd68d1d41c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,19 +29,6 @@ def upgrade():
     sa.Column('role', sa.String(length=15), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('admin',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('company_id', sa.Integer(), nullable=True),
-    sa.Column('name', sa.String(length=64), nullable=True),
-    sa.Column('email', sa.String(length=120), nullable=True),
-    sa.Column('password_hash', sa.String(length=128), nullable=True),
-    sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
-    sa.ForeignKeyConstraint(['id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    with op.batch_alter_table('admin', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_admin_email'), ['email'], unique=True)
-
     op.create_table('company_packages_and_products',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('company_id', sa.Integer(), nullable=True),
@@ -64,15 +51,53 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_customer_email'), ['email'], unique=True)
         batch_op.create_index(batch_op.f('ix_customer_phone'), ['phone'], unique=True)
 
-    op.create_table('customer_orders',
+    op.create_table('outlet',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.Column('outlet_country', sa.String(length=16), nullable=True),
+    sa.Column('outlet_name', sa.String(length=64), nullable=True),
+    sa.Column('postal', sa.String(length=64), nullable=True),
+    sa.Column('unit_number', sa.String(length=64), nullable=True),
+    sa.Column('address', sa.String(length=64), nullable=True),
+    sa.Column('phone', sa.String(length=64), nullable=True),
+    sa.Column('email', sa.String(length=120), nullable=True),
+    sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('admin',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.Column('outlet_id', sa.Integer(), nullable=True),
+    sa.Column('outlet_name', sa.String(length=64), nullable=True),
+    sa.Column('name', sa.String(length=64), nullable=True),
+    sa.Column('email', sa.String(length=120), nullable=True),
+    sa.Column('password_hash', sa.String(length=128), nullable=True),
+    sa.Column('is_superadmin', sa.Boolean(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
+    sa.ForeignKeyConstraint(['id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['outlet_id'], ['outlet.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('admin', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_admin_email'), ['email'], unique=True)
+
+    op.create_table('customer_orders',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('order_number', sa.Integer(), nullable=True),
+    sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.Column('outlet_id', sa.Integer(), nullable=True),
     sa.Column('admin_id', sa.Integer(), nullable=True),
     sa.Column('package_or_product_id', sa.Integer(), nullable=True),
+    sa.Column('item_name', sa.String(length=128), nullable=True),
+    sa.Column('price_per_item_in_cents', sa.Integer(), nullable=True),
+    sa.Column('discount_per_item_in_cents', sa.Integer(), nullable=True),
+    sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('status', sa.String(length=64), nullable=False),
     sa.ForeignKeyConstraint(['admin_id'], ['admin.id'], ),
     sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
+    sa.ForeignKeyConstraint(['outlet_id'], ['outlet.id'], ),
     sa.ForeignKeyConstraint(['package_or_product_id'], ['company_packages_and_products.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -81,9 +106,10 @@ def upgrade():
 
     op.create_table('package',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('company_id', sa.Integer(), nullable=True),
+    sa.Column('outlet_id', sa.Integer(), nullable=True),
     sa.Column('admin_id', sa.Integer(), nullable=True),
     sa.Column('cust_id', sa.Integer(), nullable=True),
-    sa.Column('company_id', sa.Integer(), nullable=True),
     sa.Column('package_name', sa.String(length=128), nullable=True),
     sa.Column('package_num_total_uses_at_start', sa.Integer(), nullable=True),
     sa.Column('package_num_used_when_keyed', sa.Integer(), nullable=True),
@@ -99,6 +125,7 @@ def upgrade():
     sa.ForeignKeyConstraint(['admin_id'], ['admin.id'], ),
     sa.ForeignKeyConstraint(['company_id'], ['company.id'], ),
     sa.ForeignKeyConstraint(['cust_id'], ['customer.id'], ),
+    sa.ForeignKeyConstraint(['outlet_id'], ['outlet.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('package', schema=None) as batch_op:
@@ -135,16 +162,17 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_customer_orders_created_at'))
 
     op.drop_table('customer_orders')
+    with op.batch_alter_table('admin', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_admin_email'))
+
+    op.drop_table('admin')
+    op.drop_table('outlet')
     with op.batch_alter_table('customer', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_customer_phone'))
         batch_op.drop_index(batch_op.f('ix_customer_email'))
 
     op.drop_table('customer')
     op.drop_table('company_packages_and_products')
-    with op.batch_alter_table('admin', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_admin_email'))
-
-    op.drop_table('admin')
     op.drop_table('user')
     op.drop_table('company')
     # ### end Alembic commands ###

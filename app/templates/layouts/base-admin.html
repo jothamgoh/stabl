@@ -118,9 +118,30 @@
             </div>
         </div>
         <div class="btn-group">
-            <button type="button" class="btn btn-sm btn-outline-primary">Share</button>
-            <button type="button" class="btn btn-sm btn-outline-primary">Export</button>
+          <a class="btn btn-sm btn-outline-primary" href="#modalChooseOutlet" data-bs-toggle="modal"> Outlet: {{ current_user.outlet_name }} </a>
+      </div>
+        <!-- Modal Content -->
+        <div class="modal fade" id="modalChooseOutlet" tabindex="-1" role="dialog" aria-labelledby="modalTitleNotify" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <p class="modal-title" id="modalTitleNotify">Change your outlet</p>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="py-3 text-center">
+                          <h2 class="h4 modal-title my-3">Current Outlet: {{ current_user.outlet_name }}</h2>
+                          <p>Any new order you create on this account will be tagged to your current outlet. This makes it easier to track the sales of each store. </p>
+                          <p>You can switch outlets at any time. </p>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <a class="btn btn-sm btn-primary" href="{{ url_for('main.change_admin_outlet') }}"> Change Default Outlet  </a>                       
+                  </div>
+              </div>
+          </div>
         </div>
+        <!-- End of Modal Content -->
       </div>
 
   {% block content %}{% endblock content %}
