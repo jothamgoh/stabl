@@ -14,19 +14,19 @@
                     <div class="col-12 d-flex align-items-center justify-content-center">
                         <div class="mb-4 mb-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
                             <div class="text-center text-md-center mb-4 mt-md-0">
-                                <h1 class="mb-0 h3">Current Outlet: {{current_user.outlet_name }}</h1>
+                                <h1 class="mb-0 h3">Default Outlet: <b>{{current_user.outlet_name }}</b></h1>
                             </div>
 
                             <form method="post" action="" class="mt-4">
                                 {{ form.hidden_tag() }}
                                 <!-- Form -->
                                 <div class="form-group mb-4">
-                                    <label for="email">Choose Your Outlet</label>
+                                    <label for="email">Change Your Default Outlet</label>
                                     <div class="input-group">
                                         {{ form.outlet_chosen(class="form-select") }}
                                     </div>
                                     <p class="text-danger">{% for errors in form.outlet_chosen.errors %}{{ errors }}{% endfor %}</p>
-                                    <p class="small"> <u><a class="text-info" href="{{ url_for('main.display_items', service_or_product='service') }}">Add a new outlet here</a></u> if you can't find what you want</p>
+                                    <p class="small"> <u><a class="text-info" href="{{ url_for('main.add_new_outlet') }}">Add a new outlet here</a></u> if you can't find what you want</p>
                                 </div>
                                 <!-- End of Form --> 
                                 <div class="d-grid">

@@ -88,3 +88,13 @@ class UpdateAdminOutletForm(FlaskForm):
     outlet_chosen = SelectField(('Outlets'), validators=[DataRequired()])
     submit = SubmitField(('Change Outlet'))
 
+
+class AddNewOutletForm(FlaskForm):
+    outlet_name = StringField(('Outlet Name'), validators=[DataRequired()])
+    postal = StringField(('Postal Code'), validators=[DataRequired()])
+    unit_number = StringField(('Unit Number'), validators=[DataRequired()])
+    address = StringField(('Address'), validators=[DataRequired()])
+    phone = StringField(('Phone Number'), validators=[DataRequired()])
+    email = StringField(('Email'), validators=[DataRequired(), Email()])
+    submit = SubmitField(('Submit'))
+

@@ -5,7 +5,8 @@ from app import db
 from flask import render_template, flash, session, redirect, url_for, request
 from app.decorators import login_required
 from app.models import Company, Customer, Package, PackageUse, User, Admin, CompanyPackagesAndProducts, CustomerOrders, Outlet
-from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, SearchCustomerForm, AddCompanyItemForm, CreateProductOrderForm, UpdateCustomerSettingsForm, UpdateAdminSettingsForm, UpdateAdminOutletForm
+from app.main.forms import CreateProductOrderForm, RegisterPackageForm, PortCustomerAndPackageForm, TransferPackageForm, SearchCustomerForm, AddCompanyItemForm, CreateProductOrderForm,\
+UpdateCustomerSettingsForm, UpdateAdminSettingsForm, UpdateAdminOutletForm, AddNewOutletForm
 from app.helperfunc import check_and_clean_phone_number, invalid_phone_number_message, check_if_cust_exists_else_create_return_custid
 from flask_login import current_user
 from app.main.email import send_package_invoice_email # to be enabled once in production
@@ -313,6 +314,35 @@ def change_admin_outlet():
     return render_template('main/change_admin_outlet.html', title='test', form=form)
 
 
+@bp.route('/admin/add-outlet', methods=['GET', 'POST'])
+@login_required(role='admin')
+def add_new_outlet():
+    form = AddNewOutletForm()
+    company_id = current_user.company_id
+    outlets_obj = Outlet.query.filter_by(company_id=company_id).all()
+    existing_outlet_names = [outlet.outlet_name for outlet in outlets_obj]
+    if form.validate_on_submit():
+        try:
+            phone_number = check_and_clean_phone_number(form.phone.data)
+        except:
+            flash(invalid_phone_number_message(), 'danger')
+            return redirect(url_for('main.add_new_outlet'))
+        new_outlet = Outlet(
+            company_id=company_id,
+            outlet_name = form.outlet_name.data, 
+            postal = form.postal.data,
+            unit_number = form.unit_number.data,
+            address = form.address.data,
+            phone = phone_number,
+            email = form.email.data
+            )
+        db.session.add(new_outlet)
+        db.session.commit()
+        flash('You succesfully created a new outlet: {}'.format(form.outlet_name.data), 'success')
+        return redirect(url_for('main.admin_home'))
+    return render_template('main/add_new_outlet.html', title='Add New Outlet', form=form, existing_outlet_names=existing_outlet_names)
+
+
 @bp.route('/admin/edit_item/<item_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
 def edit_existing_item(item_id):
@@ -475,7 +505,7 @@ def delete_customer_account():
     db.session.delete(customer)
     db.session.commit()
     flash(('Your account has been deleted. All your information has been wiped from our database.', 'danger'))
-    return redirect(url_for('main.index'))
+    return redirect(url_for('main.admin_home'))
 
 
 @bp.route('/admin-account-settings', methods=['GET', 'POST'])
