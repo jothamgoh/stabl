@@ -100,7 +100,7 @@ def register_new_package():
     company_id = current_user.company_id
     # populate package_choices
     company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages_and_products.all()
-    form.package_name.choices = [(p.item_name) for p in company_packages_obj if (p.item_type=='package')]
+    form.package_name.choices = [(p.item_name) for p in company_packages_obj if (p.item_type=='service')]
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
@@ -113,7 +113,9 @@ def register_new_package():
             flash(('The data you entered does not make sense. Please check and try again.', 'danger'))
             return redirect(url_for('main.register_new_package'))
         new_package = Package(
-            admin_id=current_user.get_id(), 
+            admin_id=current_user.get_id(),
+            outlet_id=current_user.outlet_id,
+            outlet_name=current_user.outlet_name, 
             cust_id=cust_id,
             company_id=company_id,
             package_name=form.package_name.data,
@@ -236,7 +238,7 @@ def port_customer_and_package():
     form = PortCustomerAndPackageForm()
     # populate package_choices
     company_id = current_user.company_id
-    company_packages_obj = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='package').all()
+    company_packages_obj = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='service').all()
     form.package_name.choices = [(p.item_name) for p in company_packages_obj]
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
