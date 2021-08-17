@@ -99,8 +99,8 @@ def register_new_package():
     form = RegisterPackageForm()
     company_id = current_user.company_id
     # populate package_choices
-    company_packages_obj = Company.query.filter_by(id=company_id).first().company_packages_and_products.all()
-    form.package_name.choices = [(p.item_name) for p in company_packages_obj if (p.item_type=='service')]
+    company_packages_obj = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='service').all()
+    form.package_name.choices = [(p.item_name) for p in company_packages_obj]
     if form.validate_on_submit():
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
