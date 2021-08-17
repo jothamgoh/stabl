@@ -1,0 +1,107 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %} Register New Package {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <section class="d-flex align-items-center my-5 mt-lg-6 mb-lg-5">
+            <div class="container">
+                <p class="text-center"><a href="{{ url_for('main.admin_home') }}" class="text-gray-700"><i class="fas fa-angle-left me-2"></i>Back to homepage</a></p>
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="mb-4 mb-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">Add New Outlet</h1>
+                                <p>
+                                    {% if existing_outlet_names|length>0 %}
+                                    <b>Current outlets:</b><br>
+                                    {% for outlet in existing_outlet_names %}
+                                    {{ outlet }}<br>
+                                    {% endfor %}
+                                    {% else %}
+                                    <b>No outlets have been registered</b>
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <form method="post" action="" class="mt-4">
+                                {{ form.hidden_tag() }}
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Outlet Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-store"></span></span>
+                                        {{ form.outlet_name(placeholder="E.g. Roxy Square", class="form-control") }}
+                                    </div>
+                                    <p class="text-danger">{% for errors in form.outlet_name.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Postal</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-mail-bulk"></span></span>
+                                        {{ form.postal(placeholder="E.g. 123456", class="form-control") }}
+                                    </div>
+                                    <p class="text-danger">{% for errors in form.postal.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Unit Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-sign"></span></span>
+                                        {{ form.unit_number(placeholder="E.g. 01-23", class="form-control") }}
+                                    </div>
+                                    <p class="text-danger">{% for errors in form.unit_number.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-map-marker-alt"></span></span>
+                                        {{ form.address(placeholder="E.g. 50 East Coast Road", class="form-control") }}
+                                    </div>
+                                    <p class="text-danger">{% for errors in form.address.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Outlet Phone Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-phone"></span></span>
+                                        {{ form.phone(placeholder="E.g. 91000000", class="form-control") }}
+                                    </div>  
+                                    <p class="text-danger">{% for errors in form.phone.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+                                <!-- Form -->
+                                <div class="form-group mb-4">
+                                    <label for="email">Outlet Email</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><span class="fas fa-envelope"></span></span>
+                                        {{ form.email(placeholder="E.g. salon1@example.com", class="form-control") }}
+                                    </div>
+                                    <p class="text-danger">{% for errors in form.email.errors %}{{ errors }}{% endfor %}</p>
+                                </div>
+                                <!-- End of Form -->
+ 
+                                <div class="d-grid">
+                                    <button type="submit" name="submit" class="btn btn-dark">Create New Outlet</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+        </section>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

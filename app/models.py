@@ -30,11 +30,22 @@ class Outlet(db.Model):
     outlet_country = db.Column(db.String(16), default='SG')
     outlet_name = db.Column(db.String(64))
     postal = db.Column(db.String(64))
-    unit_number = db.Column(db.String(64))
+    unit_number = db.Column(db.String(64), nullable=True)
     address = db.Column(db.String(64))
     phone = db.Column(db.String(64))
     email = db.Column(db.String(120))    
 
+    def list_outlet_attributes(self):
+        return {
+            "outlet_id": self.id,
+            "outlet_country": self.outlet_country,
+            "outlet_name": self.outlet_name,
+            "postal": self.postal,
+            "unit_number": self.unit_number,
+            "address": self.address,
+            "phone": self.phone,
+            "email": self.email
+        }
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
