@@ -104,8 +104,8 @@ class Customer(User):
 class Admin(User):
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this admin belong to
-    outlet_id = db.Column(db.Integer, db.ForeignKey('outlet.id')) # which outlet does this admin belong to. "Last used" outlet the Admin was tagged to
-    outlet_name = db.Column(db.String(64)) # outlet name which is tagged to outlet_id
+    outlet_id = db.Column(db.Integer, db.ForeignKey('outlet.id'), nullable=True) # which outlet does this admin belong to. "Last used" outlet the Admin was tagged to
+    outlet_name = db.Column(db.String(64), nullable=True) # outlet name which is tagged to outlet_id
     package_sold = db.relationship('Package', backref='admin', lazy='dynamic')
     name = db.Column(db.String(64))
     email = db.Column(db.String(120), index=True, unique=True)    
@@ -148,6 +148,7 @@ class Package(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this admin belong to
     outlet_id = db.Column(db.Integer, db.ForeignKey('outlet.id'), nullable=True) # which company does this admin belong to
+    outlet_name = db.Column(db.String(64)) # outlet name which is tagged to outlet_id
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'), nullable=True) # which admin created the package
     cust_id = db.Column(db.Integer, db.ForeignKey('customer.id')) # which customer used the package
     package_usage = db.relationship('PackageUse', backref='package', lazy='dynamic')
@@ -230,6 +231,7 @@ class CustomerOrders(db.Model): # table to conslidate all cust orders
     order_number = db.Column(db.Integer) # order number for the company
     company_id = db.Column(db.Integer, db.ForeignKey('company.id')) # which company does this Package belong to
     outlet_id = db.Column(db.Integer, db.ForeignKey('outlet.id'), nullable=True) # which outlet was the package created at
+    outlet_name = db.Column(db.String(64)) # outlet name which is tagged to outlet_id
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id')) # which admin created the package
     package_or_product_id = db.Column(db.Integer, db.ForeignKey('company_packages_and_products.id')) # this uses snake case by default!!!
     item_name = db.Column(db.String(128))
