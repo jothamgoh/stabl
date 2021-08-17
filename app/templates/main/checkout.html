@@ -13,7 +13,10 @@
             <div class="card-body">
                 <!-- Package Use -->
                 <div class="card-header">
-                    <h2 class="fs-3 fw-bold mb-0">Add Walk-in Order</h2><br> 
+                    <h2 class="fs-3 fw-bold mb-0">Add Walk-in Order</h2><br>
+                    {% if current_user.outlet_id is none %}
+                    <p class="text-danger"><b>Warning:</b> <a class="text-info" href="{{ url_for('main.change_admin_outlet') }}"><u> Please tag your account to a store here</u></a> before creating a new order.</p>
+                    {% endif %} 
                     <a class="btn btn-sm btn-info" href="#modalNewPackage" data-bs-toggle="modal"><span class="fas fa-cart-plus mr-1"></span> Add Item </a>
                     <a class="btn btn-sm btn-secondary" href="{{ url_for('main.clear_cart') }}"><span class="fas fa-minus mr-1"></span> Clear Items </a>
                 </div>    

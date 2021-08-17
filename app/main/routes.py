@@ -102,6 +102,9 @@ def register_new_package():
     company_packages_obj = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='service').all()
     form.package_name.choices = [(p.item_name) for p in company_packages_obj]
     if form.validate_on_submit():
+        if current_user.outlet_id is None:
+            flash(('Package not registered! Please tag your account to a store before trying again.'), 'danger')
+            return redirect(url_for('main.port_customer_and_package'))
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
         package_num_total_uses_at_start = form.package_num_total_uses_at_start.data
@@ -241,11 +244,16 @@ def port_customer_and_package():
     company_packages_obj = CompanyPackagesAndProducts.query.filter_by(company_id=company_id).filter_by(item_type='service').all()
     form.package_name.choices = [(p.item_name) for p in company_packages_obj]
     if form.validate_on_submit():
+        if current_user.outlet_id is None:
+            flash(('Package not ported over! Please tag your account to a store before trying again.'), 'danger')
+            return redirect(url_for('main.port_customer_and_package'))
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number, name=form.name.data)
         new_package  = Package(
             admin_id=current_user.get_id(),
             cust_id=cust_id,
+            outlet_id=current_user.outlet_id,
+            outlet_name=current_user.outlet_name,
             company_id=current_user.company_id,
             package_name=form.package_name.data,
             package_num_total_uses_at_start=form.package_num_total_uses_at_start.data,
@@ -371,6 +379,9 @@ def clear_cart():
 @bp.route('/admin/checkout', methods=['GET', 'POST'])
 @login_required(role='admin')
 def checkout():
+    if current_user.outlet_id is None:
+        flash(('Order not submitted! Please tag your account to a store before trying again.'), 'danger')
+        return redirect(url_for('main.add_item_to_cart'))
     checkout_data = session['checkout']
     max_id = db.session.query(func.max(CustomerOrders.id)).filter_by(company_id=1).first()[0]
     if max_id is None:
@@ -380,7 +391,9 @@ def checkout():
     for d in checkout_data:
         new_item = CustomerOrders(
             order_number = order_number,
-            company_id=d['company_id'], 
+            company_id=d['company_id'],
+            outlet_id=current_user.outlet_id,
+            outlet_name=current_user.outlet_name, 
             admin_id=d['admin_id'],
             package_or_product_id=d['package_or_product_id'],
             item_name = d['item_name'],

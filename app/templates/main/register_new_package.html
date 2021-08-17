@@ -16,8 +16,10 @@
                         <div class="mb-4 mb-lg-0 bg-white shadow-soft border rounded border-light p-4 p-lg-5 w-100 fmxw-500">
                             <div class="text-center text-md-center mb-4 mt-md-0">
                                 <h1 class="mb-0 h3">Register New Package</h1>
+                                {% if current_user.outlet_id is none %}
+                                <p class="text-danger"><b>Warning:</b> <a class="text-info" href="{{ url_for('main.change_admin_outlet') }}"><u> Please tag your account to a store here</u></a> before creating a new package.</p>
+                                {% endif %}
                             </div>
-
                             <form method="post" action="" class="mt-4">
                                 {{ form.hidden_tag() }}
                                 <!-- Form -->
