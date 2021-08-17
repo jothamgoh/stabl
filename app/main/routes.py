@@ -296,101 +296,6 @@ def display_items(service_or_product): # this route includes adding new services
     return render_template('main/display_company_items.html', title='Display {}'.format(service_or_product), company_item_data=company_item_data, form=form, service_or_product=service_or_product)
 
 
-@bp.route('/admin/add-outlet', methods=['GET', 'POST'])
-@login_required(role='admin')
-def add_new_outlet(): # this route includes displaying all outlets of a company
-    form = AddNewOutletForm()
-    company_id = current_user.company_id
-    outlets_obj = Outlet.query.filter_by(company_id=company_id).all()
-    outlets_data = [outlet.list_outlet_attributes() for outlet in outlets_obj]
-    if form.validate_on_submit():
-        try:
-            phone_number = check_and_clean_phone_number(form.phone.data)
-        except:
-            flash(invalid_phone_number_message(), 'danger')
-            return redirect(url_for('main.add_new_outlet'))
-        new_outlet = Outlet(
-            company_id=company_id,
-            outlet_name = form.outlet_name.data, 
-            postal = form.postal.data,
-            unit_number = form.unit_number.data,
-            address = form.address.data,
-            phone = phone_number,
-            email = form.email.data
-            )
-        db.session.add(new_outlet)
-        db.session.commit()
-        flash('You succesfully created a new outlet: {}'.format(form.outlet_name.data), 'success')
-        return redirect(url_for('main.add_new_outlet'))
-    return render_template('main/add_new_outlet.html', title='Add New Outlet', form=form, outlets_data=outlets_data)
-
-
-@bp.route('/admin/edit-outlet-data/<outlet_id>', methods=['GET', 'POST'])
-@login_required(role='admin')
-def edit_outlet_data(outlet_id):
-    form = AddNewOutletForm()
-    company_id = current_user.company_id
-    outlet_obj = Outlet.query.filter_by(company_id=company_id).filter_by(id=outlet_id).first()
-    outlet_data_dict = outlet_obj.list_outlet_attributes()
-    if form.validate_on_submit():
-        try:
-            phone_number = check_and_clean_phone_number(form.phone.data)
-        except:
-            flash(invalid_phone_number_message(), 'danger')
-            return redirect(url_for('main.add_new_outlet'))
-        outlet_obj.outlet_name = form.outlet_name.data 
-        outlet_obj.postal = form.postal.data 
-        outlet_obj.unit_number = form.unit_number.data 
-        outlet_obj.address = form.address.data 
-        outlet_obj.email = form.email.data 
-        outlet_obj.phone = phone_number 
-        db.session.commit()
-        flash(('Successfully edited outlet: {}'.format(form.outlet_name.data)), 'success')
-        return redirect(url_for('main.add_new_outlet')) 
-    elif request.method == 'GET':
-        form.outlet_name.data = outlet_data_dict['outlet_name']
-        form.postal.data = outlet_data_dict['postal']
-        form.unit_number.data = outlet_data_dict['unit_number']
-        form.address.data = outlet_data_dict['address']
-        form.phone.data = outlet_data_dict['phone']
-        form.email.data = outlet_data_dict['email']
-    return render_template('main/edit_outlet_data.html', title='Edit Outlet', form=form, outlet_data_dict=outlet_data_dict)
-
-
-@bp.route('/admin/delete-outlet/<outlet_id>', methods=['GET', 'POST'])
-@login_required(role='admin')
-def delete_existing_outlet(outlet_id):
-    company_id=current_user.company_id
-    outlet_obj = Outlet.query.filter_by(company_id=current_user.company_id).filter_by(id=outlet_id).first()
-    admins_obj = Admin.query.filter_by(company_id=company_id).filter_by(outlet_name=outlet_obj.outlet_name).all() # Query Admins who were last used that outlet
-    for admin in admins_obj: # Update all Admins outlet, if the outlet they currently are on is deleted
-        admin.outlet_name=None    
-    db.session.delete(outlet_obj)
-    db.session.commit()
-    flash(('Successfully deleted outlet'), 'success')
-    return redirect(url_for('main.add_new_outlet'))
-
-
-@bp.route('/admin/change-outlet', methods=['GET', 'POST'])
-@login_required(role='admin')
-def change_admin_outlet():
-    form = UpdateAdminOutletForm()
-    company_id = current_user.company_id
-    outlets_obj = Outlet.query.filter_by(company_id=company_id).all()
-    form.outlet_chosen.choices = [(outlet.outlet_name) for outlet in outlets_obj]
-    if form.validate_on_submit():
-        outlet_name = form.outlet_chosen.data
-        outlet_id = Outlet.query.filter_by(company_id=company_id).filter_by(outlet_name=outlet_name).first().id
-        current_user.outlet_id = outlet_id
-        current_user.outlet_name = outlet_name
-        db.session.commit()
-        flash('{} is now your default outlet'.format(outlet_name), 'success')
-        return redirect(request.referrer)
-    return render_template('main/change_admin_outlet.html', title='test', form=form)
-
-
-
-
 @bp.route('/admin/edit_item/<item_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
 def edit_existing_item(item_id):
@@ -488,6 +393,100 @@ def checkout():
     flash(('Order successful! Please make sure you have collected payment.'), 'success')
     return render_template('main/checkout_summary.html', title="Checkout Summary", checkout_data=checkout_data, order_number=order_number)
     
+
+@bp.route('/admin/add-outlet', methods=['GET', 'POST'])
+@login_required(role='admin')
+def add_new_outlet(): # this route includes displaying all outlets of a company
+    form = AddNewOutletForm()
+    company_id = current_user.company_id
+    outlets_obj = Outlet.query.filter_by(company_id=company_id).all()
+    outlets_data = [outlet.list_outlet_attributes() for outlet in outlets_obj]
+    if form.validate_on_submit():
+        try:
+            phone_number = check_and_clean_phone_number(form.phone.data)
+        except:
+            flash(invalid_phone_number_message(), 'danger')
+            return redirect(url_for('main.add_new_outlet'))
+        new_outlet = Outlet(
+            company_id=company_id,
+            outlet_name = form.outlet_name.data, 
+            postal = form.postal.data,
+            unit_number = form.unit_number.data,
+            address = form.address.data,
+            phone = phone_number,
+            email = form.email.data
+            )
+        db.session.add(new_outlet)
+        db.session.commit()
+        flash('You succesfully created a new outlet: {}'.format(form.outlet_name.data), 'success')
+        return redirect(url_for('main.add_new_outlet'))
+    return render_template('main/add_new_outlet.html', title='Add New Outlet', form=form, outlets_data=outlets_data)
+
+
+@bp.route('/admin/edit-outlet-data/<outlet_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def edit_outlet_data(outlet_id):
+    form = AddNewOutletForm()
+    company_id = current_user.company_id
+    outlet_obj = Outlet.query.filter_by(company_id=company_id).filter_by(id=outlet_id).first()
+    outlet_data_dict = outlet_obj.list_outlet_attributes()
+    if form.validate_on_submit():
+        try:
+            phone_number = check_and_clean_phone_number(form.phone.data)
+        except:
+            flash(invalid_phone_number_message(), 'danger')
+            return redirect(url_for('main.add_new_outlet'))
+        outlet_obj.outlet_name = form.outlet_name.data 
+        outlet_obj.postal = form.postal.data 
+        outlet_obj.unit_number = form.unit_number.data 
+        outlet_obj.address = form.address.data 
+        outlet_obj.email = form.email.data 
+        outlet_obj.phone = phone_number 
+        db.session.commit()
+        flash(('Successfully edited outlet: {}'.format(form.outlet_name.data)), 'success')
+        return redirect(url_for('main.add_new_outlet')) 
+    elif request.method == 'GET':
+        form.outlet_name.data = outlet_data_dict['outlet_name']
+        form.postal.data = outlet_data_dict['postal']
+        form.unit_number.data = outlet_data_dict['unit_number']
+        form.address.data = outlet_data_dict['address']
+        form.phone.data = outlet_data_dict['phone']
+        form.email.data = outlet_data_dict['email']
+    return render_template('main/edit_outlet_data.html', title='Edit Outlet', form=form, outlet_data_dict=outlet_data_dict)
+
+
+@bp.route('/admin/delete-outlet/<outlet_id>', methods=['GET', 'POST'])
+@login_required(role='admin')
+def delete_existing_outlet(outlet_id):
+    company_id=current_user.company_id
+    outlet_obj = Outlet.query.filter_by(company_id=current_user.company_id).filter_by(id=outlet_id).first()
+    admins_obj = Admin.query.filter_by(company_id=company_id).filter_by(outlet_name=outlet_obj.outlet_name).all() # Query Admins who were last used that outlet
+    for admin in admins_obj: # Update all Admins outlet, if the outlet they currently are on is deleted
+        admin.outlet_name=None    
+    db.session.delete(outlet_obj)
+    db.session.commit()
+    flash(('Successfully deleted outlet'), 'success')
+    return redirect(url_for('main.add_new_outlet'))
+
+
+@bp.route('/admin/change-outlet', methods=['GET', 'POST'])
+@login_required(role='admin')
+def change_admin_outlet():
+    form = UpdateAdminOutletForm()
+    company_id = current_user.company_id
+    outlets_obj = Outlet.query.filter_by(company_id=company_id).all()
+    form.outlet_chosen.choices = [(outlet.outlet_name) for outlet in outlets_obj]
+    if form.validate_on_submit():
+        outlet_name = form.outlet_chosen.data
+        outlet_id = Outlet.query.filter_by(company_id=company_id).filter_by(outlet_name=outlet_name).first().id
+        current_user.outlet_id = outlet_id
+        current_user.outlet_name = outlet_name
+        db.session.commit()
+        flash('{} is now your default outlet'.format(outlet_name), 'success')
+        return redirect(request.referrer)
+    return render_template('main/change_admin_outlet.html', title='test', form=form)
+
+
 
 @bp.route('/customer-account-settings', methods=['GET', 'POST'])
 @login_required(role='customer')
