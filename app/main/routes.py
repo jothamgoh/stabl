@@ -204,6 +204,8 @@ def transfer_package(package_id):
             new_package_for_transferee = Package(
                 admin_id=None,
                 cust_id=new_cust_id,
+                outlet_id=package_data['outlet_id'],
+                outlet_name=package_data['outlet_name'],
                 company_id=p.company_id,
                 package_name=p.package_name,
                 package_num_total_uses_at_start=num_uses_to_transfer,

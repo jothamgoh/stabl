@@ -175,6 +175,8 @@ class Package(db.Model):
         return {
             'package_id': self.id,
             'company': self.company,
+            'outlet_id': self.outlet_id,
+            'outlet_name': self.outlet_name,
             'package_name': self.package_name,
             'package_num_total_uses_at_start': self.package_num_total_uses_at_start,
             'package_num_used_when_keyed': self.package_num_used_when_keyed,
