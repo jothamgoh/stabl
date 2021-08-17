@@ -47,6 +47,7 @@ class Outlet(db.Model):
             "email": self.email
         }
 
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     package_use = db.relationship('PackageUse', backref='user', lazy='dynamic')

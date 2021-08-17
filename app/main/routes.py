@@ -360,7 +360,11 @@ def edit_outlet_data(outlet_id):
 @bp.route('/admin/delete-outlet/<outlet_id>', methods=['GET', 'POST'])
 @login_required(role='admin')
 def delete_existing_outlet(outlet_id):
+    company_id=current_user.company_id
     outlet_obj = Outlet.query.filter_by(company_id=current_user.company_id).filter_by(id=outlet_id).first()
+    admins_obj = Admin.query.filter_by(company_id=company_id).filter_by(outlet_name=outlet_obj.outlet_name).all() # Query Admins who were last used that outlet
+    for admin in admins_obj: # Update all Admins outlet, if the outlet they currently are on is deleted
+        admin.outlet_name=None    
     db.session.delete(outlet_obj)
     db.session.commit()
     flash(('Successfully deleted outlet'), 'success')
