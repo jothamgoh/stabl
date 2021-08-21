@@ -3,84 +3,23 @@
 {% block title %} Dashboard {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<style type="text/css">
+    .row {
+    display: flex; /* equal height of the children */
+    }
+    a {
+
+    }
+    a.btn-outline-primary {
+        display: block;
+        width: 100%;
+        }
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
-    <div class="row justify-content-md-center">
-        <div class="col-12 mb-4">
-            <div class="card bg-secondary-alt shadow-sm">
-                <div class="card-header d-sm-flex flex-row align-items-center flex-0">
-                    <div class="d-block mb-3 mb-sm-0">
-                        <div class="h5 fw-normal mb-2">Sales Value</div>
-                        <h2 class="h3">$10,567</h2>
-                        <div class="small mt-2"> 
-                            <span class="fw-bold me-2">Yesterday</span>                              
-                            <span class="fas fa-angle-up text-success"></span>                                   
-                            <span class="text-success fw-bold">10.57%</span>
-                        </div>
-                    </div>
-                    <div class="d-flex ms-auto">
-                        <a href="#" class="btn btn-secondary text-dark btn-sm me-2">Month</a>
-                        <a href="#" class="btn btn-dark btn-sm me-3">Week</a>
-                    </div>
-                </div>
-                <div class="card-body p-2">
-                    <div class="ct-chart-sales-value ct-double-octave ct-series-g"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-4 mb-4">
-            <div class="card border-light shadow-sm">
-                <div class="card-body">
-                    <div class="row d-block d-xl-flex align-items-center">
-                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
-                            <div class="icon icon-shape icon-md icon-shape-primary rounded me-4 me-sm-0"><span class="fas fa-chart-line"></span></div>
-                            <div class="d-sm-none">
-                                <h2 class="h5">Customers</h2>
-                                <h3 class="mb-1">345,678</h3>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-7 px-xl-0">
-                            <div class="d-none d-sm-block">
-                                <h2 class="h5">Customers</h2>
-                                <h3 class="mb-1">345k</h3>
-                            </div>
-                            <small>Feb 1 - Apr 1,  <span class="icon icon-small"><span class="fas fa-globe-europe"></span></span> WorldWide</small> 
-                            <div class="small mt-2">                               
-                                <span class="fas fa-angle-up text-success"></span>                                   
-                                <span class="text-success fw-bold">18.2%</span> Since last month
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-xl-4 mb-4">
-            <div class="card border-light shadow-sm">
-                <div class="card-body">
-                    <div class="row d-block d-xl-flex align-items-center">
-                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
-                            <div class="icon icon-shape icon-md icon-shape-secondary rounded me-4"><span class="fas fa-cash-register"></span></div>
-                            <div class="d-sm-none">
-                                <h2 class="h5">Revenue</h2>
-                                <h3 class="mb-1">$43,594</h3>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-7 px-xl-0">
-                            <div class="d-none d-sm-block">
-                                <h2 class="h5">Revenue</h2>
-                                <h3 class="mb-1">$43,594</h3>
-                            </div>
-                            <small>Feb 1 - Apr 1,  <span class="icon icon-small"><span class="fas fa-globe-europe"></span></span> Worldwide</small>
-                            <div class="small mt-2">                               
-                                <span class="fas fa-angle-up text-success"></span>                                   
-                                <span class="text-success fw-bold">28.2%</span> Since last month
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- <div class="row justify-content-md-center">
         <div class="col-12 col-sm-6 col-xl-4 mb-4">
             <div class="card border-light shadow-sm">
                 <div class="card-body">
@@ -98,109 +37,116 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <div class="row">
-        <div class="col-12 col-xl-8 mb-4">
-            <div class="row">
-                <div class="col-12 mb-4">
-                    <div class="card border-light shadow-sm">
-                        <div class="card-header">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                <h2 class="h5">Page visits</h2>
+        <!-- Start card -->
+        <div class="col-12 col-xl-6 mb-4">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5">Orders and Packages</h2>
+                        <p>Add walk-in orders and manage customer packages</p>
+                        <div class="d-block">
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('main.add_item_to_cart') }}" class="btn btn-outline-primary"><span class="fas fa-shoe-prints"></span> Add Walk in order </a>
                                 </div>
-                                <div class="col text-right">
-                                    <a href="#" class="btn btn-sm btn-secondary">See all</a>
+                            </div>
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('main.register_new_package') }}" class="btn btn-outline-tertiary "><span class="fas fa-tasks"></span> Register Package </a>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('main.search_for_customer') }}" class="btn btn-outline-info "><span class="fas fa-user-ninja"></span> Use Package for Customer </a>
                                 </div>
                             </div>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table align-items-center table-flush">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">Page name</th>
-                                    <th scope="col">Page Views</th>
-                                    <th scope="col">Page Value</th>
-                                    <th scope="col">Bounce rate</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <th scope="row">
-                                        /demo/admin/index.html
-                                    </th>
-                                    <td>
-                                        3,225
-                                    </td>
-                                    <td>
-                                        $20
-                                    </td>
-                                    <td>
-                                        <span class="fas fa-arrow-up text-danger me-3"></span> 42,55%
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        /demo/admin/forms.html
-                                    </th>
-                                    <td>
-                                        2,987
-                                    </td>
-                                    <td>
-                                        0
-                                    </td>
-                                    <td>
-                                        <span class="fas fa-arrow-down text-success me-3"></span> 43,52%
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        /demo/admin/util.html
-                                    </th>
-                                    <td>
-                                        2,844
-                                    </td>
-                                    <td>
-                                    294
-                                    </td>
-                                    <td>
-                                        <span class="fas fa-arrow-down text-success me-3"></span> 32,35%
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        /demo/admin/validation.html
-                                    </th>
-                                    <td>
-                                        2,050
-                                    </td>
-                                    <td>
-                                        $147
-                                    </td>
-                                    <td>
-                                        <span class="fas fa-arrow-up text-danger me-3"></span> 50,87%
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        /demo/admin/modals.html
-                                    </th>
-                                    <td>
-                                        1,483
-                                    </td>
-                                    <td>
-                                        $19
-                                    </td>
-                                    <td>
-                                        <span class="fas fa-arrow-down text-success me-3"></span> 32,24%
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                    </div>
+                </div>
+            </div>
+        <!-- End card-->
+        <!-- Start card -->
+        <div class="col-12 col-xl-6 mb-4">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5">Manage Your Store</h2>
+                        <p>Services, Products, Outlets</p>
+                        <div class="d-block">
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('main.display_items', service_or_product='service') }}" class="btn btn-outline-primary"><span class="fas fa-cut"></span> Edit Services / Packages </a>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('main.display_items', service_or_product='product') }}" class="btn btn-outline-tertiary "><span class="fas fa-box"></span> Edit Products </a>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('main.change_admin_outlet') }}" class="btn btn-outline-info "><span class="fas fa-store"></span> Edit Store Outlets </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        <!-- End card-->
+    </div>
 
+    <div class="row">
+        <!-- Start card -->
+        <div class="col-12 col-xl-6 mb-4">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5">Admin and Customers Accounts</h2>
+                        <p>Create new admins and customer accounts</p>
+                        <div class="d-block">
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('auth.admin_register') }}" class="btn btn-outline-primary"><span class="fas fa-users-cog"></span> Create Admin Account </a>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('auth.customer_register') }}" class="btn btn-outline-tertiary "><span class="fas fa-user-plus"></span> Register New Customer </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- End card-->
+        <!-- Start card -->
+        <div class="col-12 col-xl-6 mb-4">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5">Migrate Packages</h2>
+                        <p>Migrate your old packages to Stabl</p>
+                        <div class="d-block">
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <a href="{{ url_for('main.port_customer_and_package') }}" class="btn btn-outline-primary"><span class="fas fa-random"></span> Migrate Packages to Stabl </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-block">
+                            <div class="d-flex align-items-center pt-3 me-5">
+                                <div class="d-block">
+                                    <p> Contact us for bulk migration.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- End card-->
+    </div>
+
+    <!-- Start row -->
+    <div class="row">
+        <div class="col-12 col-xl-12 mb-4">
                 <!-- Start team members card -->
                 <div class="col-12 col-lg-12 mb-4">
                     <div class="card border-light shadow-sm">
@@ -249,62 +195,6 @@
                       </div>
                 </div>
                 <!-- End team members card -->
-
-            </div>
-        </div>
-        <div class="col-12 col-xl-4 mb-4">
-            <div class="col-12 px-0 mb-4">
-                <div class="card border-light shadow-sm">
-                    <div class="card-body d-flex flex-row align-items-center flex-0 border-bottom">
-                        <div class="d-block">
-                            <div class="h6 fw-normal text-gray mb-2">Total orders</div>
-                            <h2 class="h3">452</h2>
-                            <div class="small mt-2">                               
-                                <span class="fas fa-angle-up text-success"></span>                                   
-                                <span class="text-success fw-bold">18.2%</span>
-                            </div>
-                        </div>
-                        <div class="d-block ms-auto">
-                            <div class="d-flex align-items-center text-right mb-2">
-                                <span class="shape-xs rounded-circle bg-dark me-2"></span>
-                                <span class="fw-normal small">July</span>
-                            </div>
-                            <div class="d-flex align-items-center text-right">
-                                <span class="shape-xs rounded-circle bg-secondary me-2"></span>
-                                <span class="fw-normal small">August</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-2">
-                        <div class="ct-chart-ranking ct-golden-section ct-series-a"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 px-0 mb-4">
-                <div class="card border-light shadow-sm">
-                    <div class="card-body">
-                        <h2 class="h5">Acquisition</h2>
-                        <p>Tells you where your visitors originated from, such as search engines, social networks or website referrals.</p>
-                        <div class="d-block">
-                            <div class="d-flex align-items-center pt-3 me-5">
-                                <div class="icon icon-shape icon-sm icon-shape-danger rounded me-3"><span class="fas fa-chart-bar"></span></div>
-                                <div class="d-block">
-                                    <label class="mb-0">Bounce Rate</label>
-                                    <h4 class="mb-0">33.50%</h4>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center pt-3">
-                                <div class="icon icon-shape icon-sm icon-shape-quaternary rounded me-3"><span class="fas fa-chart-area"></span></div>
-                                <div class="d-block">
-                                    <label class="mb-0">Sessions</label>
-                                    <h4 class="mb-0">9,567</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
