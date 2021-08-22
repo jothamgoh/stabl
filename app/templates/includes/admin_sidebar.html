@@ -87,7 +87,13 @@
           <span class="sidebar-text">Settings</span>
         </a>
       </li>
-
+      <li class="nav-item">
+        <a href="{{ url_for('auth.logout') }}"
+          class="btn btn-warning d-flex align-items-center justify-content-center btn-upgrade-pro">
+          <span class="sidebar-icon"><span class="fas fa-sign-out-alt"></span></span> 
+            <span>Logout</span>
+        </a>
+      </li>
     </ul>
   </div>
 </nav>
