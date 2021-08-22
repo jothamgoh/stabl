@@ -25,7 +25,28 @@ def index():
 def admin_home():
     admins_obj = Admin.query.filter_by(company_id=current_user.company_id).all()
     admin_data = [admin.list_admin_data() for admin in admins_obj]
-    return render_template('admin_home.html', title='Admin Dashboard', admin_data=admin_data)
+    company_id = current_user.company_id
+    form = SearchCustomerForm() # form will be in navigation.html, and not the base-admin page
+    if form.validate_on_submit():
+        # try to find customer using phone or email
+        try: # case when customer keys in phone number
+            phone_number = check_and_clean_phone_number(form.phone_or_email.data) # if email, exception is raised. if phone number is invalid 'None' returned
+            customer = Customer.query.filter_by(phone=phone_number).first()
+        except: # case when customer keys in email or if phone number is invalid
+            customer = Customer.query.filter_by(email=form.phone_or_email.data).first()
+        if customer is None :
+            flash(('Customer email or phone not found. Please try again'), 'danger')
+            del session['cust_id']
+            return redirect(url_for('main.admin_home'))
+        count_num_packages = Package.query.filter_by(company_id=company_id).filter_by(cust_id=customer.id).count()
+        if count_num_packages == 0: # if customer exists, but does not have any packages with the salon
+            flash(('Customer does not have any existing packages with your company.'), 'danger')
+            del session['cust_id']
+            return redirect(url_for('main.admin_home'))
+        session['cust_id'] = customer.id 
+        return redirect(url_for('main.customer_home_admin_view', cust_id=session['cust_id']))
+
+    return render_template('admin_home.html', title='Admin Dashboard', admin_data=admin_data, form=form)
 
 
 @bp.route('/admin/deactivate/<admin_id>', methods=['GET', 'POST'])
