@@ -74,8 +74,8 @@
 <body>
 
   <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-md-none">
-      <a class="navbar-brand me-lg-5" href="/">
-          <img class="navbar-brand-dark" src="/static/assets/img/brand/light.svg" alt="Volt logo" /> <img class="navbar-brand-light" src="/static/assets/img/brand/dark.svg" alt="Volt logo" />
+      <a class="navbar-brand me-lg-5" href="{{ url_for('main.admin_home') }}">
+          <img class="navbar-brand-dark" src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=fba918&color=000&rounded=true&size=128&font-size=0.33&bold=true" alt="Volt logo" /> <img class="navbar-brand-light" src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=fba918&color=000&rounded=true&size=128&font-size=0.33&bold=true" alt="Volt logo" />
       </a>
       <div class="d-flex align-items-center">
           <button class="navbar-toggler d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">

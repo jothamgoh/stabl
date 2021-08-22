@@ -17,6 +17,7 @@
     </div>
     <ul class="nav flex-column pt-3 pt-md-0">
       <li class="nav-item {% if 'Admin Dashboard' in title %} active {% endif %}">
+        <p><b>User:</b> {{ current_user.name }}</p>
         <a href="{{ url_for('main.admin_home') }}" class="nav-link">
           <span class="sidebar-icon"><span class="fas fa-home"></span></span>
           <span class="sidebar-text">Home</span>
