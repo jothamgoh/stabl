@@ -77,7 +77,7 @@ def customer_home():
     # list package data
     packages = Package.query.filter_by(cust_id=current_user.id).all()
     package_data = [package.list_customer_package_data() for package in packages]
-    return render_template('customer_home.html', title='Home', package_data=package_data)
+    return render_template('customer_home.html', title='Customer Home', package_data=package_data)
 
 @bp.route('/admin/search-customer', methods=['GET', 'POST'])
 @login_required(role='admin')

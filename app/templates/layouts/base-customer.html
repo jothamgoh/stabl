@@ -75,7 +75,7 @@
 
   <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-md-none">
       <a class="navbar-brand me-lg-5" href="{{ url_for('main.customer_home') }}">
-          <img class="navbar-brand-dark" src="/static/assets/img/brand/light.svg" alt="Volt logo" /> <img class="navbar-brand-light" src="/static/assets/img/brand/dark.svg" alt="Volt logo" />
+          <img class="navbar-brand-dark" src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=fba918&color=000&rounded=true&size=128&font-size=0.33&bold=true" alt="Customer Name" /> <img class="navbar-brand-light" src="https://ui-avatars.com/api/?name={{ current_user.name }}&background=fba918&color=000&rounded=true&size=128&font-size=0.33&bold=true" alt="Customer Name" />
       </a>
       <div class="d-flex align-items-center">
           <button class="navbar-toggler d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,11 +84,9 @@
       </div>
   </nav>
 
-  {% include 'includes/sidebar.html' %} 
+  {% include 'includes/customer_sidebar.html' %} 
     
   <main class="content">
-
-    {% include 'includes/navigation.html' %}
 
     <div class="container">
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -103,20 +101,11 @@
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div class="btn-toolbar dropdown">
             <button class="btn btn-dark btn-sm me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="fas fa-plus me-2"></span>New Task
+                <span class="fas fa-user me-2"></span>{{ current_user.name }}
             </button>
             <div class="dropdown-menu dashboard-dropdown dropdown-menu-start mt-2 py-0">
-                <!-- <a class="dropdown-item fw-normal rounded-top" href="{{ url_for('main.register_new_package') }}"><span class="fa fa-tasks"></span>Register Package</a>
-                <a class="dropdown-item fw-normal" href="{{ url_for('auth.customer_register') }}"><span class="fas fa-cloud-upload-alt"></span>Register New Customer</a>
-                <a class="dropdown-item fw-normal" href="{{ url_for('auth.admin_register') }}"><span class="fas fa-user-shield"></span>Register Admin</a> -->
-                <a class="dropdown-item fw-normal" href="#"><span class="fas fa-user-shield"></span>Find Package (Placeholder)</a>
-                <!-- <div role="separator" class="dropdown-divider my-0"></div>
-                <a class="dropdown-item fw-normal rounded-bottom" href="{{ url_for('main.port_customer_and_package') }}"><span class="fas fa-rocket text-danger"></span>Port Exisiting Package</a> -->
+                <a class="dropdown-item fw-normal" href="{{ url_for('main.customer_settings') }}"><span class="fas fa-cog"></span>Account Settings</a>
             </div>
-        </div>
-        <div class="btn-group">
-            <button type="button" class="btn btn-sm btn-outline-primary">Share</button>
-            <button type="button" class="btn btn-sm btn-outline-primary">Export</button>
         </div>
     </div>
 
