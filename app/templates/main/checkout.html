@@ -27,7 +27,8 @@
                     <div class="row ps-lg-1">
                         <div class="col ms-n2">
                             {% set item_subtotal =  (item.price_per_item_in_cents - item.discount_per_item_in_cents) / 100 * item.quantity %}
-                            <b><h3 class="fs-4 fw-bold mb-1">{{ item.item_name }} x {{ item.quantity }}</h3></b>
+                            <b><h3 class="fs-4 fw-bold mb-1">{{ item.item_name }}</h3></b>
+                            <p class="mb-1">Qty: {{ item.quantity }}</p>
                             <p class="mb-1">Price: SGD {{ (item.price_per_item_in_cents / 100)|round(2, 'common') }}</p>
                             <p class="mb-1">Discount: SGD {{ (item.discount_per_item_in_cents / 100)|round(2, 'common') }}</p>
                             <p class="fs-5 fw-bold mb-1">Subtotal: {{ item_subtotal|round(2, 'common') }}</p>

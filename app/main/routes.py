@@ -103,7 +103,7 @@ def register_new_package():
     form.package_name.choices = [(p.item_name) for p in company_packages_obj]
     if form.validate_on_submit():
         if current_user.outlet_id is None:
-            flash(('Package not registered! Please tag your account to a store before trying again.'), 'danger')
+            flash(('The data you entered does not make sense. Please check and try again.'), 'danger')
             return redirect(url_for('main.port_customer_and_package'))
         phone_number = check_and_clean_phone_number(form.phone.data)
         cust_id = check_if_cust_exists_else_create_return_custid(phone=phone_number)
@@ -113,7 +113,7 @@ def register_new_package():
         company_id = company_id
 
         if package_num_total_uses_at_start <= package_num_used_when_keyed or package_price_paid_in_cents < 0:
-            flash(('The data you entered does not make sense. Please check and try again.', 'danger'))
+            flash(('The data you entered does not make sense. Please check and try again.'), 'danger')
             return redirect(url_for('main.register_new_package'))
         new_package = Package(
             admin_id=current_user.get_id(),
@@ -131,7 +131,7 @@ def register_new_package():
         flash(('You have created a package for customer with phone number: {}'.format(phone_number)), 'success')
         # send_package_invoice_email(current_user)
         return redirect(url_for('main.admin_home'))
-    return render_template('main/register_new_package.html', title='Key in package details', form=form)
+    return render_template('main/register_new_package.html', title='Migrate New Package', form=form)
 
 
 @bp.route('/package/use-package/<package_id>', methods=['GET', 'POST'])
@@ -501,7 +501,7 @@ def change_admin_outlet():
         db.session.commit()
         flash('{} is now your default outlet'.format(outlet_name), 'success')
         return redirect(request.referrer)
-    return render_template('main/change_admin_outlet.html', title='test', form=form)
+    return render_template('main/change_admin_outlet.html', title='Change Outlet', form=form)
 
 
 

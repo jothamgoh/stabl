@@ -20,7 +20,7 @@ def admin_login():
     if form.validate_on_submit():
         user = Admin.query.filter_by(email=form.email.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash(('Invalid username or password'))
+            flash(('Invalid username or password'), 'danger')
             return redirect(url_for('auth.admin_login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -47,7 +47,7 @@ def admin_register():
         db.session.commit()
         flash(('Congratulations, {} is now a registered admin!'.format(user.email)), 'success')
         return redirect(url_for('auth.admin_login'))
-    return render_template('auth/admin_register.html', title=('Register'),
+    return render_template('auth/admin_register.html', title=('Admin Register'),
                            form=form)
 
 
@@ -159,7 +159,7 @@ def customer_register():
         db.session.commit()
         flash(('Congratulations, {} is now a registered customer! Please ask them to log in'.format(user.phone)), 'success')
         return redirect(url_for('main.admin_home'))
-    return render_template('auth/customer_register.html', title=('Register'),
+    return render_template('auth/customer_register.html', title=('Register Customer'),
                            form=form)
 
 
