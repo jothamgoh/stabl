@@ -93,12 +93,10 @@ def search_for_customer(): # this does not filter customer by company. This filt
             customer = Customer.query.filter_by(email=form.phone_or_email.data).first()
         if customer is None :
             flash(('Customer email or phone not found. Please try again'), 'danger')
-            del session['cust_id']
             return redirect(url_for('main.search_for_customer'))
         count_num_packages = Package.query.filter_by(company_id=company_id).filter_by(cust_id=customer.id).count()
         if count_num_packages == 0: # if customer exists, but does not have any packages with the salon
             flash(('Customer does not have any existing packages with your company.'), 'danger')
-            del session['cust_id']
             return redirect(url_for('main.search_for_customer'))
         session['cust_id'] = customer.id 
         return redirect(url_for('main.customer_home_admin_view', cust_id=session['cust_id']))
