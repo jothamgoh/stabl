@@ -9,7 +9,7 @@
 {% block content %}
     <div class="row">
         <!-- Start card -->
-        <div class="col-12 col-xl-6 mb-4">
+        <div class="col-lg-6 mb-4">
                 <div class="card border-light shadow-sm">
                     <div class="card-body">
                         <h2 class="h5">Orders and Packages</h2>
@@ -17,17 +17,17 @@
                         <div class="d-block">
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('main.add_item_to_cart') }}" class="btn btn-outline-primary"><span class="fas fa-shoe-prints"></span> Add Walk-in Order </a>
+                                    <a href="{{ url_for('main.add_item_to_cart') }}" class="btn btn-sm btn-outline-primary"><span class="fas fa-shoe-prints"></span> Add Walk-in Order </a>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('main.register_new_package') }}" class="btn btn-outline-tertiary "><span class="fas fa-tasks"></span> Register Package </a>
+                                    <a href="{{ url_for('main.register_new_package') }}" class="btn btn-sm btn-outline-tertiary "><span class="fas fa-tasks"></span> Register Package </a>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('main.search_for_customer') }}" class="btn btn-outline-info "><span class="fas fa-user-ninja"></span> Use Package for Customer </a>
+                                    <a href="{{ url_for('main.search_for_customer') }}" class="btn btn-sm btn-outline-info "><span class="fas fa-user-ninja"></span> Use Package for Customer </a>
                                 </div>
                             </div>
                         </div>
@@ -36,7 +36,7 @@
             </div>
         <!-- End card-->
         <!-- Start card -->
-        <div class="col-12 col-xl-6 mb-4">
+        <div class="col-lg-6 mb-4">
                 <div class="card border-light shadow-sm">
                     <div class="card-body">
                         <h2 class="h5">Manage Your Business</h2>
@@ -44,17 +44,17 @@
                         <div class="d-block">
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('main.display_items', service_or_product='service') }}" class="btn btn-outline-primary"><span class="fas fa-cut"></span> Edit Services / Packages </a>
+                                    <a href="{{ url_for('main.display_items', service_or_product='service') }}" class="btn btn-sm btn-outline-primary"><span class="fas fa-cut"></span> Edit Services / Packages </a>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('main.display_items', service_or_product='product') }}" class="btn btn-outline-tertiary "><span class="fas fa-box"></span> Edit Products </a>
+                                    <a href="{{ url_for('main.display_items', service_or_product='product') }}" class="btn btn-sm btn-outline-tertiary "><span class="fas fa-box"></span> Edit Products </a>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('main.change_admin_outlet') }}" class="btn btn-outline-info "><span class="fas fa-store"></span> Edit Outlets </a>
+                                    <a href="{{ url_for('main.change_admin_outlet') }}" class="btn btn-sm btn-outline-info "><span class="fas fa-store"></span> Edit Outlets </a>
                                 </div>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
 
     <div class="row">
         <!-- Start card -->
-        <div class="col-12 col-xl-6 mb-4">
+        <div class="col-lg-6 mb-4">
                 <div class="card border-light shadow-sm">
                     <div class="card-body">
                         <h2 class="h5">Admin and Customers Accounts</h2>
@@ -74,12 +74,12 @@
                         <div class="d-block">
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('auth.admin_register') }}" class="btn btn-outline-primary"><span class="fas fa-users-cog"></span> Create Admin Account </a>
+                                    <a href="{{ url_for('auth.admin_register') }}" class="btn btn-sm btn-outline-primary"><span class="fas fa-users-cog"></span> Create Admin Account </a>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('auth.customer_register') }}" class="btn btn-outline-tertiary "><span class="fas fa-user-plus"></span> Register New Customer </a>
+                                    <a href="{{ url_for('auth.customer_register') }}" class="btn btn-sm btn-outline-tertiary "><span class="fas fa-user-plus"></span> Register New Customer </a>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +88,7 @@
             </div>
         <!-- End card-->
         <!-- Start card -->
-        <div class="col-12 col-xl-6 mb-4">
+        <div class="col-lg-6 mb-4">
                 <div class="card border-light shadow-sm">
                     <div class="card-body">
                         <h2 class="h5">Migrate Packages</h2>
@@ -96,7 +96,7 @@
                         <div class="d-block">
                             <div class="d-flex align-items-center pt-3 me-5">
                                 <div class="d-block">
-                                    <a href="{{ url_for('main.port_customer_and_package') }}" class="btn btn-outline-primary"><span class="fas fa-random"></span> Migrate Packages to Stabl </a>
+                                    <a href="{{ url_for('main.port_customer_and_package') }}" class="btn btn-sm btn-outline-primary"><span class="fas fa-random"></span> Migrate Packages to Stabl </a>
                                 </div>
                             </div>
                         </div>
@@ -115,7 +115,6 @@
 
     <!-- Start row -->
     <div class="row">
-        <div class="col-12 col-xl-12 mb-4">
                 <!-- Start team members card -->
                 <div class="col-12 col-lg-12 mb-4">
                     <div class="card border-light shadow-sm">
@@ -163,7 +162,6 @@
                       </div>
                 </div>
                 <!-- End team members card -->
-        </div>
     </div>
 
 {% endblock content %}

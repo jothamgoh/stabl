@@ -157,7 +157,7 @@ def register_new_package():
 @login_required()
 def use_package(package_id):
     package_user_id = current_user.id
-    package_user_role = User.query.filter_by(id=package_user_id).first().role
+    package_user_role = current_user.role
 
     p = Package.query.filter_by(id=package_id).first_or_404()
 
@@ -174,7 +174,7 @@ def use_package(package_id):
         # insert package use data
         package_use = PackageUse(package_id=package_id)
         package_use.num_uses = 1 # number times package used is 1 time
-        if package_user_role == 'admin': # if admin use package, take down the name of the admin
+        if package_user_role != 'customer': # if admin use package, take down the name of the admin
             admin_name = Admin.query.filter_by(id=package_user_id).first().name
             package_use.who_used_package = 'Staff ({})'.format(admin_name)
         else: # else, it's the self who use package

@@ -86,7 +86,7 @@
 
   {% include 'includes/admin_sidebar.html' %} 
     
-  <main class="content">
+  <main class="content px-0">
 
     <div class="container">
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -96,7 +96,9 @@
           {% endfor %}
       {% endif %}
       {% endwith %}
+    </div>
 
+    <div class="container px-3 px-sm-5"> 
       <!-- Top admin bar -->
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div class="btn-toolbar dropdown">
@@ -141,12 +143,12 @@
         </div>
         <!-- End of Modal Content -->
       </div>
+    </div>
 
 
-
-
-  {% block content %}{% endblock content %}
-  </div>
+<div class="container px-3 px-sm-5">
+        {% block content %}{% endblock content %}
+    </div>
 
   </main>
 

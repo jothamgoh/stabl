@@ -15,7 +15,7 @@ COPY stabl.py config.py boot.sh ./
 RUN chmod +x boot.sh
 
 ENV FLASK_APP stabl.py
-ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
 
 RUN chown -R stabl:stabl ./
 USER stabl
