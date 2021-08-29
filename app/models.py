@@ -192,7 +192,8 @@ class Package(db.Model):
 
 class PackageUse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    who_used_package = db.Column(db.Integer, db.ForeignKey('user.id')) # if is_package_transfer = 0, 'user_id' is the person who clicked "use package". if is_package_transfer=1, then 'user_id' is the person you transfer to package to, or package is trasferred from
+    who_used_package = db.Column(db.String(64)) # if package is transferred, it'll be the phone number of the transferor and transferee. If package is used, either 'self' or staff name
+    who_used_package_id = db.Column(db.Integer, db.ForeignKey('user.id')) # if is_package_transfer = 0, 'user_id' is the person who clicked "use package". if is_package_transfer=1, then 'user_id' is the person you transfer to package to, or package is trasferred from
     package_id = db.Column(db.Integer, db.ForeignKey('package.id'))
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     num_uses = db.Column(db.Integer) # number of uses for the package. A normal use is 1, a transfer can be 1 or more. If num_uses is negative, package transferred from someone else, in which case 'who_used_package' is the transferee

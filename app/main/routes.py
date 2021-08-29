@@ -174,6 +174,7 @@ def use_package(package_id):
         # insert package use data
         package_use = PackageUse(package_id=package_id)
         package_use.num_uses = 1 # number times package used is 1 time
+        package_use.who_used_package_id = package_user_id
         if package_user_role != 'customer': # if admin use package, take down the name of the admin
             admin_name = Admin.query.filter_by(id=package_user_id).first().name
             package_use.who_used_package = 'Staff ({})'.format(admin_name)
@@ -239,6 +240,7 @@ def transfer_package(package_id):
             # The person transferring the package
             p_transferor = PackageUse(package_id=package_id)
             p_transferor.who_used_package = phone_number # phone number of the person i am transferring to
+            p_transferor.who_used_package_id = current_cust_id # customer ID of transferor
             p_transferor.num_uses = num_uses_to_transfer
             p_transferor.is_package_transfer = 1
             db.session.add(p_transferor)
@@ -246,6 +248,7 @@ def transfer_package(package_id):
             # The person reciving the package
             p_recipient = PackageUse(package_id=new_package_for_transferee.id)
             p_recipient.who_used_package = current_user.phone # phone of the person I received the package from
+            p_recipient.who_used_package_id = new_cust_id # customer ID I received the package from
             p_recipient.num_uses = -num_uses_to_transfer
             p_recipient.is_package_transfer = 1
             db.session.add(p_recipient)

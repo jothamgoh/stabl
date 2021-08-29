@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 8bcd68d1d41c
+Revision ID: 447c9d3ee7b5
 Revises: 
-Create Date: 2021-08-15 21:57:59.849046
+Create Date: 2021-08-29 21:56:39.311202
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8bcd68d1d41c'
+revision = '447c9d3ee7b5'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -87,6 +87,7 @@ def upgrade():
     sa.Column('order_number', sa.Integer(), nullable=True),
     sa.Column('company_id', sa.Integer(), nullable=True),
     sa.Column('outlet_id', sa.Integer(), nullable=True),
+    sa.Column('outlet_name', sa.String(length=64), nullable=True),
     sa.Column('admin_id', sa.Integer(), nullable=True),
     sa.Column('package_or_product_id', sa.Integer(), nullable=True),
     sa.Column('item_name', sa.String(length=128), nullable=True),
@@ -108,6 +109,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('company_id', sa.Integer(), nullable=True),
     sa.Column('outlet_id', sa.Integer(), nullable=True),
+    sa.Column('outlet_name', sa.String(length=64), nullable=True),
     sa.Column('admin_id', sa.Integer(), nullable=True),
     sa.Column('cust_id', sa.Integer(), nullable=True),
     sa.Column('package_name', sa.String(length=128), nullable=True),
@@ -133,13 +135,14 @@ def upgrade():
 
     op.create_table('package_use',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('who_used_package', sa.Integer(), nullable=True),
+    sa.Column('who_used_package', sa.String(length=64), nullable=True),
+    sa.Column('who_used_package_id', sa.Integer(), nullable=True),
     sa.Column('package_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('num_uses', sa.Integer(), nullable=True),
     sa.Column('is_package_transfer', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['package_id'], ['package.id'], ),
-    sa.ForeignKeyConstraint(['who_used_package'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['who_used_package_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('package_use', schema=None) as batch_op:
