@@ -10,12 +10,12 @@ RUN venv/bin/pip install -r requirements.txt
 RUN venv/bin/pip install gunicorn pymysql cryptography
 
 COPY app app
-COPY migrations migrations
+# COPY migrations migrations
 COPY stabl.py config.py boot.sh ./
 RUN chmod +x boot.sh
 
 ENV FLASK_APP stabl.py
-ENV FLASK_DEBUG=1
+ENV FLASK_DEBUG=0
 
 RUN chown -R stabl:stabl ./
 USER stabl
